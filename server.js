@@ -4,6 +4,7 @@ const { MongoClient, ObjectId } = require("mongodb");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const mongodbPackage = require("mongodb/package.json");
 
 const app = express();
 
@@ -13,9 +14,26 @@ app.use(express.static(__dirname));
 
 const uri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017";
 const dbName = process.env.MONGODB_DB || "fuelTracker";
-const client = new MongoClient(uri, {
-  serverSelectionTimeoutMS: 10000
-});
+const mongodbDriverMajor = Number(String(mongodbPackage.version).split(".")[0]);
+const isAtlasConnection = uri.startsWith("mongodb+srv://") || uri.includes(".mongodb.net");
+const mongoClientOptions = {
+  serverSelectionTimeoutMS: 30000,
+  connectTimeoutMS: 30000,
+  socketTimeoutMS: 45000,
+  maxPoolSize: 10,
+  appName: "fuel-tracker"
+};
+
+if (mongodbDriverMajor < 4) {
+  mongoClientOptions.useNewUrlParser = true;
+  mongoClientOptions.useUnifiedTopology = true;
+}
+
+if (isAtlasConnection) {
+  mongoClientOptions.tls = true;
+}
+
+const client = new MongoClient(uri, mongoClientOptions);
 
 const SECRET = "super_secret_key_123";
 let db;
@@ -256,11 +274,28 @@ async function geocodeAddressWithFallback(query) {
 }
 
 async function connectDB() {
-  console.log(`Connecting to MongoDB database "${dbName}"...`);
-  await client.connect();
-  db = client.db(dbName);
-  await db.command({ ping: 1 });
-  console.log(`Connected to MongoDB database "${dbName}"`);
+  try {
+    console.log(`Connecting to MongoDB database "${dbName}"...`);
+    console.log(`MongoDB driver version: ${mongodbPackage.version}`);
+    console.log(`MongoDB connection type: ${isAtlasConnection ? "Atlas/TLS" : "local/standard"}`);
+    if (mongodbDriverMajor >= 4) {
+      console.log("MongoDB driver manages URL parsing and topology internally; legacy parser options are not used.");
+    }
+
+    await client.connect();
+    db = client.db(dbName);
+    await db.command({ ping: 1 });
+    console.log(`Connected to MongoDB database "${dbName}"`);
+  } catch (err) {
+    db = null;
+    console.error("MongoDB connection error:", {
+      name: err.name,
+      code: err.code,
+      codeName: err.codeName,
+      message: err.message
+    });
+    throw err;
+  }
 }
 
 function requireDb(req, res, next) {
