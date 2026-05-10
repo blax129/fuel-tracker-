@@ -282,7 +282,7 @@
     let stations = [];
     let selectedStation = null;
 
-    fetch("https://fuel-tracker-w4ym.onrender.com/stations")
+    fetch("/stations")
       .then(res => res.json())
       .then(data => { stations = Array.isArray(data) ? data : []; })
       .catch(() => { stations = []; });
@@ -334,7 +334,7 @@
       message.textContent = "Submitting account for verification...";
       signupBtn.disabled = true;
 
-      fetch("https://fuel-tracker-w4ym.onrender.com/partner/signup", {
+      fetch("/partner/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

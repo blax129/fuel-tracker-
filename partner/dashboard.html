@@ -391,7 +391,7 @@
 
     renderFuelCards();
 
-    fetch("https://fuel-tracker-w4ym.onrender.com/partner/me", {
+    fetch("/partner/me", {
       headers: { "Authorization": "Bearer " + token }
     })
     .then(async res => {
@@ -445,7 +445,7 @@
       };
 
       setMessage(fuelMessage, "Publishing fuel update...");
-      fetch("https://fuel-tracker-w4ym.onrender.com/reports", {
+      fetch("/reports", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -473,7 +473,7 @@
     profileForm.addEventListener("submit", event => {
       event.preventDefault();
       setMessage(profileMessage, "Saving station profile...");
-      fetch("https://fuel-tracker-w4ym.onrender.com/partner/station-profile", {
+      fetch("/partner/station-profile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -495,7 +495,7 @@
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
       localStorage.removeItem("partnerToken");
-      fetch("https://fuel-tracker-w4ym.onrender.com/partner/logout", { method: "POST" })
+      fetch("/partner/logout", { method: "POST" })
         .finally(() => {
           window.location.href = "/partner/login";
         });

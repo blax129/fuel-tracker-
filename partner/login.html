@@ -178,7 +178,7 @@
     }
 
     if (partnerAuth.getToken()) {
-      fetch("https://fuel-tracker-w4ym.onrender.com/partner/me", {
+      fetch("/partner/me", {
         headers: { "Authorization": "Bearer " + partnerAuth.getToken() }
       })
       .then(res => {
@@ -193,7 +193,7 @@
       setMessage("Signing in...");
       loginBtn.disabled = true;
 
-      fetch("https://fuel-tracker-w4ym.onrender.com/partner/login", {
+      fetch("/partner/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
