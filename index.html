@@ -1,0 +1,3255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fuel Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  >
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+  >
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+  >
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f6f6;
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+
+    .app {
+      max-width: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      box-shadow: 0 1px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    .header-inner {
+      max-width: 1120px;
+      min-height: 64px;
+      margin: 0 auto;
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .header-left,
+    .auth-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: #172033;
+      text-decoration: none;
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: #0f766e;
+      color: #ffffff;
+      flex: 0 0 auto;
+    }
+
+    .menu-toggle {
+      width: 42px;
+      height: 42px;
+      display: none;
+      place-items: center;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: #172033;
+      cursor: pointer;
+      margin: 0;
+      padding: 0;
+    }
+
+    .menu-toggle:hover,
+    .menu-toggle:focus {
+      background: #f3f4f6;
+      outline: none;
+    }
+
+    .menu-icon,
+    .menu-icon::before,
+    .menu-icon::after {
+      width: 22px;
+      height: 2px;
+      display: block;
+      border-radius: 999px;
+      background: #172033;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .menu-icon {
+      position: relative;
+    }
+
+    .menu-icon::before,
+    .menu-icon::after {
+      content: "";
+      position: absolute;
+      left: 0;
+    }
+
+    .menu-icon::before {
+      top: -7px;
+    }
+
+    .menu-icon::after {
+      top: 7px;
+    }
+
+    body.menu-open .menu-icon {
+      background: transparent;
+    }
+
+    body.menu-open .menu-icon::before {
+      top: 0;
+      transform: rotate(45deg);
+    }
+
+    body.menu-open .menu-icon::after {
+      top: 0;
+      transform: rotate(-45deg);
+    }
+
+    .nav-link,
+    .auth-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0 12px;
+      border-radius: 10px;
+      color: #172033;
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus,
+    .auth-link:hover,
+    .auth-link:focus {
+      background: #f3f4f6;
+      outline: none;
+    }
+
+    .auth-actions button {
+      min-height: 38px;
+      margin: 0;
+      padding: 0 12px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .signup-link {
+      background: #0f766e;
+      color: #ffffff;
+    }
+
+    .signup-link:hover,
+    .signup-link:focus {
+      background: #115e59;
+    }
+
+    .mobile-menu {
+      position: fixed;
+      inset: 64px 0 0;
+      z-index: 999;
+      display: none;
+      background: #ffffff;
+      overflow-y: auto;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    body.menu-open .mobile-menu {
+      display: block;
+    }
+
+    .menu-panel {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 8px 18px 28px;
+    }
+
+    .menu-link {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e5e7eb;
+      color: #172033;
+      font-size: 20px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .menu-link:hover,
+    .menu-link:focus {
+      color: #0f766e;
+      outline: none;
+    }
+
+    .hero {
+      position: sticky;
+      top: 64px;
+      z-index: 900;
+      margin: 0;
+      padding: 10px 12px;
+      background: rgba(243, 246, 246, 0.94);
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-panel {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      background: #ffffff;
+      color: #172033;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+    }
+
+    .hero h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: 19px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      max-width: 640px;
+      margin: 4px 0 0;
+      color: #64748b;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .hero-search {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .hero-search input {
+      min-height: 48px;
+      margin: 0;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      background: #f8fafc;
+      font-size: 16px;
+    }
+
+    .hero-search input:focus {
+      border-color: #fbbf24;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.24);
+    }
+
+    .search-meta {
+      margin-top: 6px;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 700;
+      min-height: 16px;
+    }
+
+    .search-meta.loading {
+      color: #0f766e;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+
+    .location-btn {
+      min-height: 48px;
+      margin: 0;
+      padding: 0 18px;
+      border: 1px solid #fbbf24;
+      border-radius: 12px;
+      background: #fbbf24;
+      color: #172033;
+      font-size: 15px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .location-btn:hover,
+    .location-btn:focus {
+      background: #f59e0b;
+      color: #172033;
+      outline: none;
+    }
+
+    .hero-note {
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .header {
+      background: #0f766e;
+      color: white;
+      padding: 22px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .discovery-strip {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 26px;
+    }
+
+    .header p {
+      margin: 6px 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 18px 0 10px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      color: #111827;
+      font-size: 18px;
+    }
+
+    .section-heading span {
+      color: #6b7280;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .nearby-list {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .controls {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .product-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 0 8px;
+      scrollbar-width: thin;
+    }
+
+    .product-tab {
+      min-height: 40px;
+      margin: 0;
+      padding: 0 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 999px;
+      background: #ffffff;
+      color: #334155;
+      font-size: 13px;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+    }
+
+    .product-tab:hover,
+    .product-tab:focus,
+    .product-tab.active {
+      border-color: #0f766e;
+      background: #0f766e;
+      color: #ffffff;
+      outline: none;
+    }
+
+    .product-tab.ev-tab:hover,
+    .product-tab.ev-tab:focus,
+    .product-tab.ev-tab.active {
+      border-color: #0284c7;
+      background: #0284c7;
+      color: #ffffff;
+    }
+
+    .filter-box {
+      display: block;
+      background: white;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 0;
+      color: #333;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .filter-box input {
+      width: auto;
+      margin-right: 6px;
+    }
+
+    .card {
+      background: white;
+      padding: 16px;
+      margin: 10px 0;
+      border-radius: 16px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      border-left: 5px solid #0f766e;
+    }
+
+    .nearby-card {
+      margin: 0;
+      border-left-color: #2563eb;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .station-name {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .info {
+      margin-top: 6px;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .station-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px 10px;
+      margin-top: 10px;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+      margin-top: 14px;
+    }
+
+    .product-card {
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #f8fafc;
+    }
+
+    .product-card.is-emphasized {
+      border-color: #0f766e;
+      background: #ecfdf5;
+      box-shadow: 0 8px 18px rgba(15, 118, 110, 0.12);
+    }
+
+    .ev-card {
+      margin-top: 12px;
+      padding: 13px;
+      border: 1px solid #bae6fd;
+      border-left: 4px solid #22c55e;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ecfeff 0%, #f0fdf4 100%);
+      color: #0f172a;
+    }
+
+    .ev-card.is-emphasized {
+      box-shadow: 0 10px 22px rgba(14, 165, 233, 0.16);
+    }
+
+    .product-grid .ev-card {
+      grid-column: 1 / -1;
+      margin-top: 0;
+    }
+
+    .ev-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .ev-title {
+      color: #0369a1;
+      font-weight: 900;
+    }
+
+    .ev-details {
+      margin-top: 7px;
+      color: #0f766e;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .ev-ports {
+      margin-top: 5px;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .ev-badge {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .product-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 9px;
+    }
+
+    .product-name {
+      display: grid;
+      gap: 2px;
+      color: #111827;
+      font-weight: 900;
+    }
+
+    .product-name small {
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .product-price {
+      color: #111827;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .product-time {
+      margin-top: 5px;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .product-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .product-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .station-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .station-actions button {
+      margin-top: 0;
+    }
+
+    .price-trend {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+    }
+
+    .price-trend-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 7px;
+      color: #374151;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .trend-pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      text-transform: none;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .trend-up {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .trend-down {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .trend-flat {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .trend-unknown {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .trend-details {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      color: #4b5563;
+      font-size: 13px;
+    }
+
+    .trend-label {
+      display: block;
+      margin-bottom: 2px;
+      color: #6b7280;
+      font-size: 11px;
+    }
+
+    .trend-value {
+      font-weight: bold;
+      color: #111827;
+    }
+
+    .badge {
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 13px;
+    }
+
+    .green {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .red {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .orange {
+      background: #ffedd5;
+      color: #9a3412;
+    }
+
+    .amber {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .gray {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .cheapest-badge {
+      display: inline-block;
+      margin-bottom: 8px;
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fcd34d;
+    }
+
+    .cheapest-card {
+      border-left-color: #f59e0b;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.18);
+    }
+
+    .outdated-card {
+      opacity: 0.68;
+    }
+
+    .follow-btn {
+      background: #f59e0b;
+      margin-right: 8px;
+    }
+
+    .auth-required-btn {
+      background: #334155;
+    }
+
+    .auth-required-btn:hover {
+      background: #1e293b;
+    }
+
+    .follow-btn:hover {
+      background: #d97706;
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #0f766e;
+      color: white;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #115e59;
+    }
+
+    .submit-btn {
+      width: 100%;
+    }
+
+    .update-form {
+      display: none;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid #eee;
+    }
+
+    input, select {
+      display: block;
+      margin: 8px 0;
+      padding: 11px;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+
+    .empty {
+      text-align: center;
+      color: #777;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .map-section {
+      background: white;
+      padding: 0;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .map-section summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px;
+      cursor: pointer;
+      color: #0f766e;
+      font-weight: bold;
+      list-style: none;
+    }
+
+    .map-section summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .map-section summary span {
+      color: #6b7280;
+      font-size: 12px;
+      font-weight: normal;
+    }
+
+    .map-inner {
+      padding: 0 12px 12px;
+    }
+
+    #map {
+      width: 100%;
+      height: 260px;
+      border-radius: 10px;
+    }
+
+    .auth-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(15, 23, 42, 0.5);
+    }
+
+    .auth-modal.is-open {
+      display: flex;
+    }
+
+    .auth-dialog {
+      width: min(100%, 420px);
+      padding: 22px;
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.25);
+    }
+
+    .auth-dialog h2 {
+      margin: 0 0 8px;
+      color: #111827;
+      font-size: 24px;
+    }
+
+    .auth-dialog p {
+      margin: 0 0 16px;
+      color: #4b5563;
+      line-height: 1.5;
+    }
+
+    .auth-modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .modal-link,
+    .modal-secondary {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 14px;
+      border-radius: 10px;
+      color: #ffffff;
+      background: #0f766e;
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .modal-secondary {
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      color: #172033;
+    }
+
+    .discovery-map {
+      --sheet-height: 96px;
+      position: relative;
+      min-height: calc(100dvh - 190px);
+      height: calc(100dvh - 190px);
+      overflow: hidden;
+      background: #dbeafe;
+    }
+
+    .map-section {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      border-radius: 0;
+      box-shadow: none;
+      overflow: hidden;
+    }
+
+    .map-inner {
+      height: 100%;
+      padding: 0;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      background: #e0f2fe;
+    }
+
+    .map-locate-btn {
+      position: absolute;
+      right: 14px;
+      bottom: calc(var(--sheet-height) + 18px);
+      z-index: 650;
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      margin: 0;
+      padding: 0;
+      border: 1px solid #dbeafe;
+      border-radius: 999px;
+      background: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+      transition: bottom 0.22s ease, transform 0.2s ease;
+    }
+
+    .bottom-sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 620;
+      height: var(--sheet-height);
+      display: flex;
+      flex-direction: column;
+      border-radius: 24px 24px 0 0;
+      background: #ffffff;
+      box-shadow: 0 -14px 38px rgba(15, 23, 42, 0.18);
+      transition: height 0.24s ease;
+    }
+
+    .bottom-sheet.is-dragging {
+      transition: none;
+    }
+
+    .sheet-handle {
+      width: 100%;
+      min-height: auto;
+      margin: 0;
+      flex: 0 0 auto;
+      padding: 14px 18px 12px;
+      border: none;
+      background: transparent;
+      color: #0f172a;
+      cursor: grab;
+      text-align: left;
+      touch-action: pan-y;
+    }
+
+    .sheet-handle:hover,
+    .sheet-handle:focus {
+      background: transparent;
+      color: #0f172a;
+      outline: none;
+    }
+
+    .sheet-grip {
+      width: 44px;
+      height: 6px;
+      margin: 0 auto 12px;
+      border-radius: 999px;
+      background: #cbd5e1;
+    }
+
+    .sheet-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .sheet-title-row strong {
+      color: #0f172a;
+      font-size: 17px;
+    }
+
+    .sheet-title-row span {
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .sheet-content {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 0 14px 22px;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+    }
+
+    .sheet-content .section-heading {
+      margin-top: 12px;
+    }
+
+    .sheet-content .card {
+      margin: 10px 0;
+      border-left-width: 4px;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    .sheet-content .card.is-selected-station {
+      border-left-color: #2563eb;
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.16);
+      transform: translateY(-1px);
+    }
+
+    .directions-btn {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 0;
+      padding: 0 12px;
+      border-radius: 10px;
+      background: #2563eb;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .directions-btn:hover,
+    .directions-btn:focus {
+      background: #1d4ed8;
+      outline: none;
+    }
+
+    .price-marker {
+      position: relative;
+      min-width: 48px;
+      min-height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 9px;
+      border: 2px solid #ffffff;
+      border-radius: 999px;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0;
+      white-space: nowrap;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.22);
+      transform: translateY(0) scale(1);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+      animation: markerPop 0.2s ease both;
+    }
+
+    .price-marker::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -5px;
+      width: 9px;
+      height: 9px;
+      border-right: 2px solid #ffffff;
+      border-bottom: 2px solid #ffffff;
+      background: inherit;
+      transform: translateX(-50%) rotate(45deg);
+    }
+
+    .price-marker.green { background: #16a34a; }
+    .price-marker.yellow { background: #eab308; color: #172033; }
+    .price-marker.red { background: #dc2626; }
+    .price-marker.gray { background: #64748b; }
+    .price-marker.blue { background: #2563eb; }
+
+    .price-marker.is-selected {
+      transform: translateY(-4px) scale(1.12);
+      box-shadow: 0 16px 30px rgba(15, 23, 42, 0.3);
+    }
+
+    .price-marker.is-best {
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18), 0 14px 28px rgba(15, 23, 42, 0.24);
+    }
+
+    .price-marker .best-flag {
+      position: absolute;
+      left: 50%;
+      top: -18px;
+      padding: 3px 6px;
+      border-radius: 999px;
+      background: #ffffff;
+      color: #166534;
+      font-size: 9px;
+      font-weight: 900;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.14);
+      transform: translateX(-50%);
+    }
+
+    @keyframes markerPop {
+      from { opacity: 0.68; transform: translateY(3px) scale(0.92); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .user-location-marker {
+      width: 20px;
+      height: 20px;
+      border: 4px solid #ffffff;
+      border-radius: 999px;
+      background: #2563eb;
+      box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.18), 0 8px 18px rgba(15, 23, 42, 0.22);
+    }
+
+    .user-location-marker-approximate {
+      background: #f59e0b;
+      box-shadow: 0 0 0 8px rgba(245, 158, 11, 0.2), 0 8px 18px rgba(15, 23, 42, 0.22);
+    }
+
+    .user-location-marker-cached {
+      background: #7c3aed;
+      box-shadow: 0 0 0 8px rgba(124, 58, 237, 0.2), 0 8px 18px rgba(15, 23, 42, 0.22);
+    }
+
+    @media (max-width: 640px) {
+      .app,
+      .hero {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .desktop-auth,
+      .desktop-nav {
+        display: none;
+      }
+
+      .menu-toggle {
+        display: grid;
+      }
+
+      .hero-panel {
+        padding: 22px 16px;
+      }
+
+      .hero h1 {
+        font-size: 18px;
+      }
+
+      .hero-search {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions {
+        display: none;
+      }
+
+
+      .discovery-map {
+        min-height: calc(100dvh - 258px);
+        height: calc(100dvh - 258px);
+      }
+
+      .map-locate-btn {
+        top: 14px;
+        bottom: auto;
+      }
+
+      .filters-grid,
+      .station-meta,
+      .product-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .trend-details {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open menu" aria-expanded="false">
+        <span class="menu-icon"></span>
+      </button>
+      <a class="brand-link" href="index.html" aria-label="Fuel Tracker home">
+        <span class="brand-mark">⛽</span>
+        <span>Fuel Tracker</span>
+      </a>
+      <nav class="desktop-nav" aria-label="Primary">
+        <a class="nav-link" href="#stations">Stations</a>
+      </nav>
+    </div>
+
+    <div class="auth-actions desktop-auth" id="userBar"></div>
+  </div>
+</header>
+
+<nav class="mobile-menu" id="mobileMenu" aria-label="Main menu">
+  <div class="menu-panel">
+    <a class="menu-link" href="#searchInput">Search Fuel Station Near Me <span>›</span></a>
+    <a class="menu-link" href="login.html">Log In / Sign Up <span>›</span></a>
+    <a class="menu-link" href="/partner/login">Station Owner Portal <span>›</span></a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-panel">
+    <div>
+      <h1>Find fuel stations, prices, and availability near you.</h1>
+      <p>Browse Lagos stations, search by area, station name, or address, and open the map without creating an account.</p>
+    </div>
+
+    <div class="hero-search">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search area, station, or address..."
+        list="addressSuggestions"
+        aria-label="Search by area, station, or address"
+      >
+      <button id="getLocationBtn" class="location-btn" type="button">📍 Use My Location</button>
+    </div>
+    <datalist id="addressSuggestions"></datalist>
+    <div id="searchMeta" class="search-meta"></div>
+
+    <div class="hero-actions">
+      <span class="hero-note">Login is only needed to report prices, save favorites, claim stations, or edit station information.</span>
+    </div>
+
+  </div>
+</section>
+
+<div class="app">
+
+  <section class="discovery-map" id="mapSection">
+    <div id="alerts"></div>
+
+    <div class="map-section">
+      <div class="map-inner">
+        <div id="map"></div>
+      </div>
+    </div>
+
+    <button class="map-locate-btn" id="mapLocateBtn" type="button" aria-label="Center on current location">⌖</button>
+
+    <section class="bottom-sheet" id="bottomSheet" aria-label="Nearby fuel station results">
+      <button class="sheet-handle" id="sheetHandle" type="button" aria-label="Expand station results">
+        <span class="sheet-grip"></span>
+        <span class="sheet-title-row">
+          <strong id="sheetTitle">Nearby Fuel Stations</strong>
+          <span id="resultCount">Loading</span>
+        </span>
+      </button>
+
+      <div class="sheet-content" id="sheetContent">
+        <div class="controls">
+          <div class="product-tabs" id="productTabs" aria-label="Fuel product filter">
+            <button class="product-tab active" type="button" data-product="all">All</button>
+            <button class="product-tab" type="button" data-product="pms">Petrol PMS</button>
+            <button class="product-tab" type="button" data-product="ago">Diesel AGO</button>
+            <button class="product-tab" type="button" data-product="dpk">Kerosene DPK</button>
+            <button class="product-tab" type="button" data-product="lpg">Gas LPG</button>
+            <button class="product-tab ev-tab" type="button" data-product="ev">⚡ EV Charging</button>
+          </div>
+
+          <label class="filter-box">
+            Select area:
+            <select id="areaFilter">
+              <option value="">All areas</option>
+              <option>Igando</option>
+              <option>Ikotun</option>
+              <option>Idimu</option>
+              <option>Egbeda</option>
+              <option>Isheri</option>
+              <option>Powerline</option>
+              <option>Iyana Iba</option>
+              <option>Iba</option>
+              <option>Iyana School</option>
+              <option>Festac</option>
+              <option>Ajao Estate</option>
+              <option>Agege</option>
+              <option>Ketu</option>
+              <option>Ojota</option>
+              <option>Ojo Elegba</option>
+              <option>Oshodi</option>
+              <option>Iyana Ipaja</option>
+              <option>CMS</option>
+              <option>Obalende</option>
+              <option>Victoria Island</option>
+              <option>Lekki</option>
+              <option>Ajah</option>
+              <option>Chevron</option>
+              <option>Ikoyi</option>
+              <option>Mile 2</option>
+              <option>Alakija</option>
+              <option>Trade Fair</option>
+              <option>Agbara</option>
+              <option>Berger</option>
+            </select>
+          </label>
+
+          <div class="filters-grid">
+            <label class="filter-box">
+              <input type="checkbox" id="fuelFilter">
+              Show only stations with fuel
+            </label>
+
+            <label class="filter-box">
+              <input type="checkbox" id="favoritesFilter">
+              Show only favorites
+            </label>
+
+            <label class="filter-box">
+              <input type="checkbox" id="favoriteAlertsFilter">
+              Show only favorite station alerts
+            </label>
+          </div>
+        </div>
+
+        <div class="section-heading">
+          <h2>Nearby Fuel Stations</h2>
+          <span id="sortModeLabel">Sorted by distance</span>
+        </div>
+        <div id="stations"></div>
+      </div>
+    </section>
+  </section>
+
+</div>
+
+<div class="auth-modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+  <div class="auth-dialog">
+    <h2 id="authModalTitle">Login required for this action</h2>
+    <p id="authModalMessage">You can keep browsing stations and prices without an account. Login or sign up when you want to save or contribute.</p>
+    <div class="auth-modal-actions">
+      <a class="modal-link" href="login.html">Log In</a>
+      <a class="modal-link" href="login.html?mode=signup">Sign Up</a>
+      <button class="modal-secondary" type="button" id="authModalClose">Keep Browsing</button>
+    </div>
+  </div>
+</div>
+
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script>
+function getToken() {
+  return localStorage.getItem("token");
+}
+let userLocation = null;
+let userLocationSource = "device";
+let locationSet = false;
+let locationRequestPending = false;
+let centerOnUserNextUpdate = false;
+let map = null;
+let stationMarkersLayer = null;
+let userLocationMarker = null;
+let selectedStationId = null;
+let bestPriceStationId = null;
+let currentPriceStats = { min: null, max: null, average: null };
+let allStations = [];
+let stationSortMode = "nearest";
+let mapHasSettled = false;
+const warnedCoordinateStations = new Set();
+let stationLoadPending = false;
+let autocompletePending = false;
+let autocompleteTimer = null;
+const autocompleteRequestState = { requestId: 0 };
+const geocodeRequestState = { requestId: 0 };
+const geocodeFallbackCache = new Map();
+let locationUiWatchdog = null;
+const LAST_KNOWN_LOCATION_KEY = "fuelTracker.lastKnownLocation";
+const LAGOS_CENTER = { lat: 6.5244, lng: 3.3792 };
+const LAGOS_COORDINATE_BOUNDS = {
+  minLat: 6.2,
+  maxLat: 6.85,
+  minLng: 2.7,
+  maxLng: 4.45
+};
+const AREA_CENTER_COORDINATES = {
+  agege: { lat: 6.621, lng: 3.325 },
+  ajah: { lat: 6.469, lng: 3.585 },
+  akoka: { lat: 6.519, lng: 3.397 },
+  alimosho: { lat: 6.601, lng: 3.288 },
+  amuwo: { lat: 6.457, lng: 3.318 },
+  "amuwo odofin": { lat: 6.457, lng: 3.318 },
+  apapa: { lat: 6.448, lng: 3.364 },
+  badagry: { lat: 6.415, lng: 2.881 },
+  berger: { lat: 6.642, lng: 3.374 },
+  "ebute metta": { lat: 6.487, lng: 3.381 },
+  egbeda: { lat: 6.596, lng: 3.289 },
+  festac: { lat: 6.469, lng: 3.284 },
+  gbagada: { lat: 6.558, lng: 3.394 },
+  ikeja: { lat: 6.602, lng: 3.351 },
+  ikorodu: { lat: 6.619, lng: 3.510 },
+  ikotun: { lat: 6.544, lng: 3.267 },
+  ilupeju: { lat: 6.552, lng: 3.362 },
+  isolo: { lat: 6.539, lng: 3.323 },
+  ketu: { lat: 6.595, lng: 3.388 },
+  lekki: { lat: 6.447, lng: 3.472 },
+  maryland: { lat: 6.572, lng: 3.368 },
+  mushin: { lat: 6.531, lng: 3.349 },
+  ojodu: { lat: 6.641, lng: 3.365 },
+  oshodi: { lat: 6.556, lng: 3.343 },
+  surulere: { lat: 6.501, lng: 3.357 },
+  yaba: { lat: 6.516, lng: 3.379 }
+};
+const loginUrl = "login.html";
+const signupUrl = "login.html?mode=signup";
+const fuelProducts = [
+  { key: "pms", label: "Petrol", code: "PMS" },
+  { key: "ago", label: "Diesel", code: "AGO" },
+  { key: "dpk", label: "Kerosene", code: "DPK" },
+  { key: "lpg", label: "Cooking Gas", code: "LPG" }
+];
+let activeProductFilter = "all";
+
+function requestUserLocation() {
+  const locationBtn = document.getElementById("getLocationBtn");
+  const previousLocationText = locationBtn.textContent || "📍 Use My Location";
+
+  if (locationRequestPending) {
+    return;
+  }
+
+  if (!navigator.geolocation) {
+    alert("Your browser does not support geolocation. You can still search by area, station name, or address.");
+    return;
+  }
+
+  const isLocalhost = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+  if (!window.isSecureContext && !isLocalhost) {
+    alert("Location needs a secure connection (HTTPS). Please open this app on HTTPS to use device location.");
+    return;
+  }
+
+  locationRequestPending = true;
+  locationBtn.disabled = true;
+  locationBtn.textContent = "Getting location...";
+  if (mapLocateBtn) {
+    mapLocateBtn.disabled = true;
+  }
+  if (locationUiWatchdog) clearTimeout(locationUiWatchdog);
+  locationUiWatchdog = setTimeout(() => {
+    if (!locationRequestPending) return;
+    locationRequestPending = false;
+    locationBtn.disabled = false;
+    locationBtn.textContent = "📍 Use My Location";
+    if (mapLocateBtn) mapLocateBtn.disabled = false;
+    setSearchMeta("Location request timed out. Please retry.");
+  }, 28000);
+
+  getDeviceLocation()
+    .then(position => {
+      if (locationUiWatchdog) {
+        clearTimeout(locationUiWatchdog);
+        locationUiWatchdog = null;
+      }
+      userLocation = {
+        lat: Number(position.coords.latitude),
+        lng: Number(position.coords.longitude)
+      };
+      userLocationSource = "device";
+      saveLastKnownLocation(userLocation, userLocationSource);
+
+      locationSet = true;
+      locationRequestPending = false;
+      centerOnUserNextUpdate = true;
+      locationBtn.disabled = false;
+      locationBtn.textContent = "Location enabled";
+      if (mapLocateBtn) {
+        mapLocateBtn.disabled = false;
+      }
+      updateUserLocationMarker();
+      if (map) {
+        map.flyTo([userLocation.lat, userLocation.lng], 14, { duration: 0.7 });
+      }
+      if (allStations.length) {
+        applyStationFilters({ centerUser: true });
+      } else {
+        loadStations({ centerUser: true });
+      }
+    })
+    .catch(error => {
+      if (locationUiWatchdog) {
+        clearTimeout(locationUiWatchdog);
+        locationUiWatchdog = null;
+      }
+      locationSet = false;
+      locationRequestPending = false;
+      locationBtn.disabled = false;
+      locationBtn.textContent = previousLocationText.includes("Getting") ? "📍 Use My Location" : previousLocationText;
+      if (mapLocateBtn) {
+        mapLocateBtn.disabled = false;
+      }
+      const denied = error && Number(error.code) === 1;
+      const timeout = error && Number(error.code) === 3;
+      console.error("Geolocation error:", error);
+      attemptApproximateLocationFallback({ denied, timeout, locationBtn, previousLocationText });
+    });
+}
+
+function attemptApproximateLocationFallback({ denied, timeout, locationBtn, previousLocationText }) {
+  setSearchMeta("Using approximate network location...", true);
+  fetch("http://localhost:3000/api/location/ip")
+    .then(res => res.ok ? res.json() : Promise.reject(new Error(`IP location failed: ${res.status}`)))
+    .then(payload => {
+      const result = payload?.result || {};
+      const lat = Number(result.latitude);
+      const lng = Number(result.longitude);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+        throw new Error("IP location provider returned invalid coordinates");
+      }
+
+      userLocation = { lat, lng };
+      userLocationSource = "approximate";
+      saveLastKnownLocation(userLocation, userLocationSource);
+      locationSet = true;
+      locationRequestPending = false;
+      centerOnUserNextUpdate = true;
+      locationBtn.disabled = false;
+      locationBtn.textContent = "Approximate location";
+      if (mapLocateBtn) mapLocateBtn.disabled = false;
+      updateUserLocationMarker();
+      setSearchMeta("Approximate location enabled");
+      if (map) {
+        map.flyTo([lat, lng], 12, { duration: 0.7 });
+      }
+      if (allStations.length) {
+        applyStationFilters({ centerUser: true });
+      } else {
+        loadStations({ centerUser: true });
+      }
+      alert(timeout
+        ? "GPS timed out. Using approximate network location instead."
+        : denied
+        ? "Location permission blocked. Using approximate network location instead."
+        : "Using approximate network location.");
+    })
+    .catch(fallbackError => {
+      const lastKnown = readLastKnownLocation();
+      if (lastKnown) {
+        userLocation = { lat: lastKnown.lat, lng: lastKnown.lng };
+        userLocationSource = "cached";
+        locationSet = true;
+        locationRequestPending = false;
+        centerOnUserNextUpdate = true;
+        locationBtn.disabled = false;
+        locationBtn.textContent = "Saved location";
+        if (mapLocateBtn) mapLocateBtn.disabled = false;
+        setSearchMeta("Using saved location");
+        updateUserLocationMarker();
+        if (map) {
+          map.flyTo([userLocation.lat, userLocation.lng], 12, { duration: 0.7 });
+        }
+        if (allStations.length) {
+          applyStationFilters({ centerUser: true });
+        } else {
+          loadStations({ centerUser: true });
+        }
+        alert("Live location failed. Using your last saved location.");
+        return;
+      }
+
+      locationSet = false;
+      locationRequestPending = false;
+      locationBtn.disabled = false;
+      locationBtn.textContent = previousLocationText.includes("Getting") ? "📍 Use My Location" : previousLocationText;
+      if (mapLocateBtn) mapLocateBtn.disabled = false;
+      setSearchMeta("");
+      alert(denied
+        ? "Location permission is blocked for this site. Allow location access in browser settings and retry."
+        : timeout
+        ? "Location request timed out and fallback failed. Please retry in a stronger network area."
+        : "Location could not be enabled. Please check browser permission, GPS, and network, then retry."
+      );
+      console.error("Approximate location fallback error:", fallbackError);
+    });
+}
+
+function saveLastKnownLocation(location, source) {
+  if (!location) return;
+  const lat = Number(location.lat);
+  const lng = Number(location.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+  try {
+    localStorage.setItem(LAST_KNOWN_LOCATION_KEY, JSON.stringify({
+      lat,
+      lng,
+      source: source || "unknown",
+      savedAt: Date.now()
+    }));
+  } catch (error) {
+    console.warn("Could not save last known location:", error);
+  }
+}
+
+function readLastKnownLocation() {
+  try {
+    const raw = localStorage.getItem(LAST_KNOWN_LOCATION_KEY);
+    if (!raw) return null;
+    const value = JSON.parse(raw);
+    const lat = Number(value?.lat);
+    const lng = Number(value?.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    return { lat, lng, source: value?.source || "cached" };
+  } catch (error) {
+    return null;
+  }
+}
+
+function getCurrentPositionWithOptions(options) {
+  return new Promise((resolve, reject) => {
+    let done = false;
+    const guardTimeout = setTimeout(() => {
+      if (done) return;
+      done = true;
+      const timeoutError = new Error("Geolocation callback timeout");
+      timeoutError.code = 3;
+      reject(timeoutError);
+    }, Math.max((options?.timeout || 12000) + 3000, 10000));
+
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        if (done) return;
+        done = true;
+        clearTimeout(guardTimeout);
+        resolve(position);
+      },
+      error => {
+        if (done) return;
+        done = true;
+        clearTimeout(guardTimeout);
+        reject(error);
+      },
+      options
+    );
+  });
+}
+
+async function getDeviceLocation() {
+  if (navigator.permissions && navigator.permissions.query) {
+    try {
+      const status = await navigator.permissions.query({ name: "geolocation" });
+      if (status.state === "denied") {
+        const deniedError = new Error("Geolocation permission denied");
+        deniedError.code = 1;
+        throw deniedError;
+      }
+    } catch (error) {
+      // Ignore permissions API failures; continue with geolocation call.
+    }
+  }
+
+  const attempts = [
+    { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 },
+    { enableHighAccuracy: false, timeout: 20000, maximumAge: 120000 }
+  ];
+  let lastError = null;
+
+  for (const options of attempts) {
+    try {
+      return await getCurrentPositionWithOptions(options);
+    } catch (error) {
+      lastError = error;
+      if (error && Number(error.code) === 1) break;
+    }
+  }
+
+  throw lastError || new Error("Unable to retrieve location");
+}
+
+document.getElementById("getLocationBtn").addEventListener("click", requestUserLocation);
+
+const container = document.getElementById("stations");
+const searchInput = document.getElementById("searchInput");
+const fuelFilter = document.getElementById("fuelFilter");
+const areaFilter = document.getElementById("areaFilter");
+const productTabs = document.getElementById("productTabs");
+const favoritesFilter = document.getElementById("favoritesFilter");
+const favoriteAlertsFilter = document.getElementById("favoriteAlertsFilter");
+const mapSection = document.querySelector(".map-section");
+const menuToggle = document.getElementById("menuToggle");
+const mobileMenu = document.getElementById("mobileMenu");
+const authModal = document.getElementById("authModal");
+const authModalClose = document.getElementById("authModalClose");
+const authModalTitle = document.getElementById("authModalTitle");
+const authModalMessage = document.getElementById("authModalMessage");
+const bottomSheet = document.getElementById("bottomSheet");
+const sheetHandle = document.getElementById("sheetHandle");
+const sheetTitle = document.getElementById("sheetTitle");
+const sheetContent = document.getElementById("sheetContent");
+const resultCount = document.getElementById("resultCount");
+const discoveryMap = document.querySelector(".discovery-map");
+const mapLocateBtn = document.getElementById("mapLocateBtn");
+const sortModeLabel = document.getElementById("sortModeLabel");
+const addressSuggestions = document.getElementById("addressSuggestions");
+const searchMeta = document.getElementById("searchMeta");
+
+if (mapSection) {
+  mapSection.addEventListener("toggle", () => {
+    if (mapSection.open && map) {
+      setTimeout(() => map.invalidateSize(), 100);
+    }
+  });
+}
+
+function getFavoriteStationIds() {
+  try {
+    const raw = localStorage.getItem("favoriteStationIds");
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    console.error("Failed to parse favorites:", err);
+    return [];
+  }
+}
+
+function saveFavoriteStationIds(ids) {
+  localStorage.setItem("favoriteStationIds", JSON.stringify(ids));
+}
+
+function isFavoriteStation(stationId) {
+  const id = String(stationId);
+  return getFavoriteStationIds().includes(id);
+}
+
+function toggleFavorite(stationId) {
+  if (!getToken()) {
+    showAuthModal(
+      "Login to save favorites",
+      "Browsing stations and checking prices is open to everyone. Log in or sign up when you want to save favorite stations."
+    );
+    return;
+  }
+
+  const id = String(stationId);
+  const favorites = getFavoriteStationIds();
+  const exists = favorites.includes(id);
+  const nextFavorites = exists
+    ? favorites.filter(favoriteId => favoriteId !== id)
+    : [...favorites, id];
+
+  saveFavoriteStationIds(nextFavorites);
+  applyStationFilters();
+}
+
+function setMenuOpen(isOpen) {
+  document.body.classList.toggle("menu-open", isOpen);
+  menuToggle.setAttribute("aria-expanded", String(isOpen));
+  menuToggle.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
+}
+
+function showAuthModal(title, message) {
+  authModalTitle.textContent = title;
+  authModalMessage.textContent = message;
+  authModal.classList.add("is-open");
+}
+
+function closeAuthModal() {
+  authModal.classList.remove("is-open");
+}
+
+menuToggle.addEventListener("click", () => {
+  setMenuOpen(!document.body.classList.contains("menu-open"));
+});
+
+mobileMenu.addEventListener("click", event => {
+  if (event.target.closest("a")) {
+    setMenuOpen(false);
+  }
+});
+
+authModalClose.addEventListener("click", closeAuthModal);
+authModal.addEventListener("click", event => {
+  if (event.target === authModal) {
+    closeAuthModal();
+  }
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    setMenuOpen(false);
+    closeAuthModal();
+  }
+});
+
+function normalizeAreaName(value) {
+  return (value || "").toString().trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function setSearchMeta(message, loading = false) {
+  if (!searchMeta) return;
+  searchMeta.textContent = message || "";
+  searchMeta.classList.toggle("loading", Boolean(loading));
+}
+
+function normalizeConfidenceValue(station) {
+  const confidence = Number(station?.geocodeMeta?.confidence);
+  if (!Number.isFinite(confidence)) return 0;
+  return Math.max(0, Math.min(1, confidence));
+}
+
+function getGeocodeConfidenceLabel(station) {
+  const confidence = normalizeConfidenceValue(station);
+  if (confidence >= 0.8) return "Address verified";
+  if (confidence >= 0.6) return "Address likely";
+  return "Address approximate";
+}
+
+function addAddressSuggestionOptions(predictions) {
+  if (!addressSuggestions) return;
+  addressSuggestions.innerHTML = "";
+  predictions.forEach(item => {
+    const option = document.createElement("option");
+    option.value = item.description;
+    addressSuggestions.appendChild(option);
+  });
+}
+
+function getStationFullAddress(station) {
+  return station.fullAddress || station.address || "";
+}
+
+function isCurrentLocationSearch(value) {
+  const text = (value || "").toLowerCase().trim();
+  return ["current location", "my location", "near me", "nearby"].some(term => text.includes(term));
+}
+
+function numericCoordinate(value) {
+  if (value === "" || value === null || value === undefined) return null;
+  const coordinate = Number(value);
+  return Number.isFinite(coordinate) ? coordinate : null;
+}
+
+function isValidStationCoordinate(lat, lng) {
+  return Number.isFinite(lat) &&
+    Number.isFinite(lng) &&
+    lat >= LAGOS_COORDINATE_BOUNDS.minLat &&
+    lat <= LAGOS_COORDINATE_BOUNDS.maxLat &&
+    lng >= LAGOS_COORDINATE_BOUNDS.minLng &&
+    lng <= LAGOS_COORDINATE_BOUNDS.maxLng;
+}
+
+function getStationCoordinateCandidates(station) {
+  const location = station.location || {};
+  const geo = station.geo || station.geometry || {};
+  const coordinates = location.coordinates || station.coordinates || geo.coordinates;
+  const candidates = [
+    [station.latitude, station.longitude],
+    [station.lat, station.lng],
+    [station.lat, station.lon],
+    [station.latitude, station.lng],
+    [location.lat, location.lng],
+    [location.latitude, location.longitude],
+    [location.lat, location.lon],
+    [geo.lat, geo.lng],
+    [geo.latitude, geo.longitude]
+  ];
+
+  if (Array.isArray(coordinates) && coordinates.length >= 2) {
+    candidates.push([coordinates[1], coordinates[0]]);
+  }
+
+  return candidates;
+}
+
+function stationWarningKey(station) {
+  return String(station?._id || station?.name || Math.random());
+}
+
+function warnMissingStationCoordinates(station, reason) {
+  const key = stationWarningKey(station);
+  if (warnedCoordinateStations.has(key)) return;
+  warnedCoordinateStations.add(key);
+  console.warn("Station is missing valid coordinates; using approximate map location.", {
+    stationId: station?._id || null,
+    name: station?.name || "Unnamed station",
+    area: station?.area || null,
+    address: getStationFullAddress(station || {}),
+    reason
+  });
+}
+
+function getAreaCenter(area) {
+  const normalizedArea = normalizeAreaName(area);
+  if (!normalizedArea) return null;
+  if (AREA_CENTER_COORDINATES[normalizedArea]) return AREA_CENTER_COORDINATES[normalizedArea];
+
+  const matchingKey = Object.keys(AREA_CENTER_COORDINATES).find(key =>
+    normalizedArea.includes(key) || key.includes(normalizedArea)
+  );
+  return matchingKey ? AREA_CENTER_COORDINATES[matchingKey] : null;
+}
+
+function getCoordinateOffset(station) {
+  const seed = String(station?._id || station?.name || station?.address || station?.area || "");
+  let hash = 0;
+  for (let index = 0; index < seed.length; index += 1) {
+    hash = (hash * 31 + seed.charCodeAt(index)) % 100000;
+  }
+  const latOffset = ((hash % 17) - 8) * 0.0012;
+  const lngOffset = (((Math.floor(hash / 17) % 17) - 8) * 0.0012);
+  return { lat: latOffset, lng: lngOffset };
+}
+
+function getApproximateStationLatLng(station) {
+  const center = getAreaCenter(station?.area) || LAGOS_CENTER;
+  const offset = getCoordinateOffset(station);
+  return {
+    lat: center.lat + offset.lat,
+    lng: center.lng + offset.lng,
+    approximate: true,
+    source: getAreaCenter(station?.area) ? "area" : "lagos-center"
+  };
+}
+
+function getStationLatLng(station) {
+  if (!station) return null;
+  const candidates = getStationCoordinateCandidates(station);
+
+  for (const [rawLat, rawLng] of candidates) {
+    const lat = numericCoordinate(rawLat);
+    const lng = numericCoordinate(rawLng);
+    if (isValidStationCoordinate(lat, lng)) {
+      return { lat, lng, approximate: false, source: "station" };
+    }
+  }
+
+  const hasAnyCoordinateValue = candidates.some(([rawLat, rawLng]) =>
+    rawLat !== null && rawLat !== undefined && rawLat !== "" ||
+    rawLng !== null && rawLng !== undefined && rawLng !== ""
+  );
+  warnMissingStationCoordinates(
+    station,
+    hasAnyCoordinateValue ? "invalid-coordinate-values" : "missing-coordinate-fields"
+  );
+  return getApproximateStationLatLng(station);
+}
+
+function auditStationMapData(stations) {
+  const totals = {
+    total: stations.length,
+    exactCoordinates: 0,
+    approximateCoordinates: 0,
+    missingName: 0,
+    missingArea: 0
+  };
+
+  stations.forEach(station => {
+    if (!station?.name) totals.missingName += 1;
+    if (!station?.area) totals.missingArea += 1;
+    const point = getStationLatLng(station);
+    if (point?.approximate) {
+      totals.approximateCoordinates += 1;
+    } else if (point) {
+      totals.exactCoordinates += 1;
+    }
+  });
+
+  if (totals.approximateCoordinates || totals.missingName || totals.missingArea) {
+    console.warn("Station map data audit:", totals);
+  }
+}
+
+function legacyAvailabilityToStatus(value) {
+  if (value === true) return "Available";
+  if (value === false) return "Out of Stock";
+  return "Out of Stock";
+}
+
+function getFuelProductMeta(productKey) {
+  return fuelProducts.find(product => product.key === productKey) || fuelProducts[0];
+}
+
+function isEvFilterActive() {
+  return activeProductFilter === "ev";
+}
+
+function normalizeProduct(productKey, station) {
+  const product = station.products?.[productKey] || station.latestReport?.products?.[productKey] || {};
+  const legacyFallback = productKey === "pms"
+    ? {
+        price: station.latestReport?.price ?? station.price,
+        status: legacyAvailabilityToStatus(station.latestReport?.fuelAvailable ?? station.fuelAvailable),
+        lastUpdated: station.latestReport?.createdAt ?? station.lastUpdated
+      }
+    : { lastUpdated: station.lastUpdated || station.latestReport?.createdAt || null };
+  const priceValue = product.price ?? legacyFallback.price ?? null;
+  const price = priceValue === "" || priceValue === null || priceValue === undefined
+    ? null
+    : Number(priceValue);
+  const status = product.status || legacyFallback.status || "Out of Stock";
+
+  return {
+    price: Number.isFinite(price) ? price : null,
+    status,
+    lastUpdated: product.lastUpdated || legacyFallback.lastUpdated || null
+  };
+}
+
+function getStationProducts(station) {
+  return fuelProducts.map(product => ({
+    ...product,
+    ...normalizeProduct(product.key, station)
+  }));
+}
+
+function normalizeEvCharging(station) {
+  const ev = station.evCharging || station.latestReport?.evCharging || {};
+  const priceValue = ev.pricePerKwh ?? ev.pricePerKWh ?? ev.price ?? null;
+  const pricePerKwh = priceValue === "" || priceValue === null || priceValue === undefined
+    ? null
+    : Number(priceValue);
+  const portsValue = ev.availablePorts ?? ev.ports ?? null;
+  const availablePorts = portsValue === "" || portsValue === null || portsValue === undefined
+    ? null
+    : Number(portsValue);
+  const availability = ev.availability || "Unavailable";
+
+  return {
+    enabled: Boolean(ev.enabled) && availability !== "Unavailable",
+    availability,
+    chargerType: ev.chargerType || "Fast Charger",
+    pricePerKwh: Number.isFinite(pricePerKwh) ? pricePerKwh : null,
+    availablePorts: Number.isFinite(availablePorts) ? Math.max(0, Math.floor(availablePorts)) : null,
+    lastUpdated: ev.lastUpdated || station.latestReport?.createdAt || null
+  };
+}
+
+function stationHasEvCharging(station) {
+  const ev = normalizeEvCharging(station);
+  return ev.enabled && ev.availability !== "Out of Service";
+}
+
+function stationHasAvailableEvCharging(station) {
+  const ev = normalizeEvCharging(station);
+  return stationHasEvCharging(station) && (ev.availability === "Available" || ev.availability === "Limited");
+}
+
+function getVisibleProducts(station) {
+  if (isEvFilterActive()) return [];
+  const products = getStationProducts(station);
+  if (activeProductFilter === "all") return products;
+  return products.filter(product => product.key === activeProductFilter);
+}
+
+function getPrimaryProduct(station) {
+  if (isEvFilterActive()) {
+    const ev = normalizeEvCharging(station);
+    return {
+      key: "ev",
+      label: "EV Charging",
+      code: "EV",
+      price: ev.pricePerKwh,
+      status: ev.availability,
+      lastUpdated: ev.lastUpdated
+    };
+  }
+  const products = getVisibleProducts(station);
+  return products[0] || normalizeProduct("pms", station);
+}
+
+function stationHasAvailableProduct(station) {
+  if (isEvFilterActive()) return stationHasAvailableEvCharging(station);
+  return getVisibleProducts(station).some(product => product.status === "Available" || product.status === "Low Stock");
+}
+
+function initMap() {
+  if (!window.L) return;
+
+  map = L.map("map", {
+    zoomControl: false
+  }).setView([6.545, 3.27], 11);
+  L.control.zoom({ position: "bottomright" }).addTo(map);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+
+  stationMarkersLayer = L.markerClusterGroup({
+    showCoverageOnHover: false,
+    spiderfyOnMaxZoom: true,
+    maxClusterRadius: 45
+  });
+  map.addLayer(stationMarkersLayer);
+  map.on("moveend zoomend", () => {
+    mapHasSettled = true;
+    applyStationFilters({ fitMap: false });
+  });
+}
+
+function updateUserLocationMarker() {
+  if (!map || !userLocation) return;
+  const markerClass = userLocationSource === "approximate"
+    ? "user-location-marker user-location-marker-approximate"
+    : userLocationSource === "cached"
+    ? "user-location-marker user-location-marker-cached"
+    : "user-location-marker";
+  const icon = L.divIcon({
+    className: "",
+    html: `<div class="${markerClass}"></div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
+  });
+
+  if (userLocationMarker) {
+    userLocationMarker.setLatLng([userLocation.lat, userLocation.lng]);
+    return;
+  }
+
+  userLocationMarker = L.marker([userLocation.lat, userLocation.lng], { icon, interactive: false }).addTo(map);
+}
+
+function getMarkerColor(station) {
+  if (isEvFilterActive() || stationHasEvCharging(station)) return "blue";
+  const product = getMarkerProduct(station);
+  const price = getStationPrice(station);
+  if (
+    !Number.isFinite(price) ||
+    product.status === "Out of Stock" ||
+    product.status === "Unavailable" ||
+    product.status === "Out of Service"
+  ) {
+    return "gray";
+  }
+  if (product.status === "Low Stock" || product.status === "Limited") return "yellow";
+  if (station._id === bestPriceStationId) return "green";
+  if (currentPriceStats.average !== null && price > currentPriceStats.average) return "red";
+  return "yellow";
+}
+
+function getDirectionsUrl(station) {
+  const point = getStationLatLng(station);
+  if (!point) return "#";
+  const destination = `${point.lat},${point.lng}`;
+  const origin = userLocation ? `${userLocation.lat},${userLocation.lng}` : "";
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}${origin ? `&origin=${encodeURIComponent(origin)}` : ""}`;
+}
+
+function selectStationFromMap(stationId) {
+  selectedStationId = String(stationId);
+  const heights = getSheetHeights();
+  setBottomSheetHeight(Math.max(heights.mid, heights.collapsed));
+  updateMapStations(window.currentDisplayedStations || []);
+
+  window.requestAnimationFrame(() => {
+    const card = document.getElementById(`station-card-${stationId}`);
+    if (!card) return;
+    document.querySelectorAll(".is-selected-station").forEach(element => {
+      element.classList.remove("is-selected-station");
+    });
+    card.classList.add("is-selected-station");
+    card.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
+function createStationMarker(station, isCheapest) {
+  const point = getStationLatLng(station);
+  if (!point) return null;
+  const markerColor = getMarkerColor(station);
+  const isSelected = selectedStationId === String(station._id);
+  const isBest = bestPriceStationId !== null && station._id === bestPriceStationId;
+  const bestLabel = isBest ? '<span class="best-flag">Best Price</span>' : "";
+  const icon = L.divIcon({
+    className: "",
+    html: `<div class="price-marker ${markerColor} ${isSelected ? "is-selected" : ""} ${isBest ? "is-best" : ""}">${bestLabel}${formatMarkerPrice(station)}</div>`,
+    iconSize: [64, 38],
+    iconAnchor: [32, 38],
+    popupAnchor: [0, -36]
+  });
+
+  const marker = L.marker([point.lat, point.lng], {
+    icon,
+    title: station.name,
+    riseOnHover: true,
+    zIndexOffset: isSelected ? 1000 : 0
+  });
+  marker.on("click", () => selectStationFromMap(station._id));
+  return marker;
+}
+
+function updateMapStations(stations, options = {}) {
+  if (!map || !stationMarkersLayer) return;
+
+  stationMarkersLayer.clearLayers();
+  const bounds = [];
+  const cheapestStationId = bestPriceStationId;
+
+  stations.forEach(station => {
+    const point = getStationLatLng(station);
+    if (!point) return;
+
+    const priceText = formatActiveEnergyPrice(getStationPrice(station));
+    const product = getPrimaryProduct(station);
+    const fuelStatus = product.status;
+    const productLabel = activeProductFilter === "all" ? "PMS" : product.code;
+    const locationNote = point.approximate ? "Approximate location<br>" : "";
+    const geocodeNote = getStationFullAddress(station) ? `${getGeocodeConfidenceLabel(station)}<br>` : "";
+
+    const isCheapest = cheapestStationId !== null && station._id === cheapestStationId;
+    const marker = createStationMarker(station, isCheapest);
+    if (!marker) return;
+    marker.bindPopup(
+      `<strong>${station.name}</strong><br>` +
+      `${isCheapest ? "Best Price<br>" : ""}` +
+      `Area: ${station.area}<br>` +
+      `${getStationFullAddress(station) ? `Address: ${getStationFullAddress(station)}<br>` : ""}` +
+      geocodeNote +
+      locationNote +
+      `${productLabel}: ${priceText}<br>` +
+      `Status: ${fuelStatus}<br>` +
+      `<a href="${getDirectionsUrl(station)}" target="_blank" rel="noopener">Directions</a>`
+    );
+
+    marker.addTo(stationMarkersLayer);
+    bounds.push([point.lat, point.lng]);
+  });
+
+  if (options.centerUser && userLocation && Number.isFinite(userLocation.lat) && Number.isFinite(userLocation.lng)) {
+    updateUserLocationMarker();
+    centerOnUserNextUpdate = false;
+    map.flyTo([userLocation.lat, userLocation.lng], 14, { duration: 0.7 });
+    return;
+  }
+
+  if (options.fitMap && bounds.length > 0) {
+    map.fitBounds(bounds, { padding: [42, 42], animate: true, duration: 0.6 });
+  }
+}
+
+// 📏 Distance function
+function getDistance(lat1, lng1, lat2, lng2) {
+  lat1 = Number(lat1);
+  lng1 = Number(lng1);
+  lat2 = Number(lat2);
+  lng2 = Number(lng2);
+
+  if ([lat1, lng1, lat2, lng2].some(v => Number.isNaN(v))) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+
+  const a =
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI/180) *
+    Math.cos(lat2 * Math.PI/180) *
+    Math.sin(dLng/2) * Math.sin(dLng/2);
+
+  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+}
+
+function getBadgeClass(value, type) {
+  if (type === "ev") {
+    if (value === "Available") return "green";
+    if (value === "Limited") return "amber";
+    if (value === "Unavailable" || value === "Out of Service") return "red";
+    return "gray";
+  }
+
+  if (type === "fuel") {
+    if (value === "Available") return "green";
+    if (value === "Low Stock") return "amber";
+    if (value === "Out of Stock" || value === "Not Available") return "red";
+    return "gray";
+  }
+
+  if (type === "open") {
+    if (value === "Open") return "green";
+    if (value === "Closed") return "red";
+    return "orange";
+  }
+
+  if (type === "queue") {
+    if (value === "short") return "green";
+    if (value === "medium") return "orange";
+    if (value === "long") return "red";
+    return "gray";
+  }
+}
+
+function getFreshnessStatus(createdAt) {
+  if (!createdAt) return "🔴 Outdated";
+
+  const createdTime = new Date(createdAt).getTime();
+  if (Number.isNaN(createdTime)) return "🔴 Outdated";
+
+  const minutesAgo = (Date.now() - createdTime) / (1000 * 60);
+
+  if (minutesAgo <= 10) return "🟢 Updated just now";
+  if (minutesAgo <= 60) return "🟡 Updated recently";
+  return "🔴 Outdated";
+}
+
+function getStationLastUpdated(station) {
+  if (isEvFilterActive()) return normalizeEvCharging(station).lastUpdated;
+  return getPrimaryProduct(station).lastUpdated || station.latestReport?.createdAt || station.lastUpdated || null;
+}
+
+function getStationFuelAvailable(station) {
+  return stationHasAvailableProduct(station);
+}
+
+function getFreshnessMinutes(createdAt) {
+  if (!createdAt) return Number.POSITIVE_INFINITY;
+
+  const createdTime = new Date(createdAt).getTime();
+  if (Number.isNaN(createdTime)) return Number.POSITIVE_INFINITY;
+
+  return Math.max(0, (Date.now() - createdTime) / (1000 * 60));
+}
+
+function getFreshnessScore(createdAt) {
+  const minutesAgo = getFreshnessMinutes(createdAt);
+  if (!Number.isFinite(minutesAgo)) return 0;
+  if (minutesAgo <= 10) return 30;
+  if (minutesAgo <= 60) return 20;
+  if (minutesAgo <= 180) return 10;
+  return 2;
+}
+
+function getStationDistance(station) {
+  if (!userLocation) return Number.POSITIVE_INFINITY;
+
+  const point = getStationLatLng(station);
+  if (!point) return Number.POSITIVE_INFINITY;
+
+  const stationLat = point.lat;
+  const stationLng = point.lng;
+  return getDistance(userLocation.lat, userLocation.lng, stationLat, stationLng);
+}
+
+function getSmartStationScore(station) {
+  const report = station.latestReport || {};
+  const price = getStationPrice(station);
+  const distance = getStationDistance(station);
+  const product = getPrimaryProduct(station);
+  let score = 0;
+
+  if (product.status === "Available") score += 1000;
+  if (product.status === "Low Stock" || product.status === "Limited") score += 520;
+  if (product.status === "Out of Stock" || product.status === "Unavailable" || product.status === "Out of Service") score -= 300;
+  if (report.isOpen === true) score += 120;
+  if (report.isOpen === false) score -= 80;
+
+  if (report.queueLevel === "short") score += 80;
+  if (report.queueLevel === "medium") score += 35;
+  if (report.queueLevel === "long") score -= 35;
+
+  if (Number.isFinite(distance)) score += Math.max(0, 250 - distance * 18);
+  score += getFreshnessScore(getStationLastUpdated(station));
+
+  if (Number.isFinite(price)) score += Math.max(0, 160 - price / 10);
+
+  return score;
+}
+
+function sortStationsSmartly(stations) {
+  if (stationSortMode === "cheapest") {
+    return [...stations].sort((a, b) => {
+      const priceA = getStationPrice(a);
+      const priceB = getStationPrice(b);
+      if (Number.isFinite(priceA) && Number.isFinite(priceB) && priceA !== priceB) return priceA - priceB;
+      if (Number.isFinite(priceA)) return -1;
+      if (Number.isFinite(priceB)) return 1;
+      return getStationDistance(a) - getStationDistance(b);
+    });
+  }
+
+  if (userLocation) {
+    return [...stations].sort((a, b) => {
+      const distanceA = getStationDistance(a);
+      const distanceB = getStationDistance(b);
+      if (distanceA !== distanceB) return distanceA - distanceB;
+      return getStationPrice(a) - getStationPrice(b);
+    });
+  }
+
+  return [...stations].sort((a, b) => {
+    const nameA = (a.name || "").toLowerCase();
+    const nameB = (b.name || "").toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+}
+
+function getReportPrice(report) {
+  if (!report || report.price === null || report.price === undefined || report.price === "") {
+    return null;
+  }
+
+  const price = Number(report.price);
+  return Number.isFinite(price) ? price : null;
+}
+
+function getStationPrice(station) {
+  if (isEvFilterActive()) return normalizeEvCharging(station).pricePerKwh;
+  return getPrimaryProduct(station).price;
+}
+
+function getMarkerProduct(station) {
+  return getPrimaryProduct(station);
+}
+
+function formatPrice(price) {
+  return Number.isFinite(price) ? `₦${price}` : "—";
+}
+
+function formatEvPrice(price) {
+  return Number.isFinite(price) ? `₦${price}/kWh` : "Price not set";
+}
+
+function formatActiveEnergyPrice(price) {
+  return isEvFilterActive() ? formatEvPrice(price) : formatPrice(price);
+}
+
+function formatMarkerPrice(station) {
+  const product = getMarkerProduct(station);
+  if (product.status === "Low Stock" || product.status === "Limited") return "LOW";
+  if (product.status === "Out of Stock" || product.status === "Unavailable" || product.status === "Out of Service") return "OUT";
+  const price = getStationPrice(station);
+  if (!Number.isFinite(price)) return "OUT";
+  return isEvFilterActive() ? `₦${price}/kWh` : `₦${price}`;
+}
+
+function updatePriceStats(stations) {
+  const pricedStations = stations
+    .map(station => ({ stationId: station._id, price: getStationPrice(station) }))
+    .filter(item => Number.isFinite(item.price));
+
+  if (pricedStations.length === 0) {
+    bestPriceStationId = null;
+    currentPriceStats = { min: null, max: null, average: null };
+    return;
+  }
+
+  const prices = pricedStations.map(item => item.price);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const average = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+  const best = pricedStations
+    .filter(item => item.price === min)
+    .sort((a, b) => {
+      const stationA = stations.find(station => station._id === a.stationId);
+      const stationB = stations.find(station => station._id === b.stationId);
+      return getStationDistance(stationA) - getStationDistance(stationB);
+    })[0];
+
+  bestPriceStationId = best?.stationId || null;
+  currentPriceStats = { min, max, average };
+}
+
+function formatProductUpdated(lastUpdated) {
+  if (!lastUpdated) return "No update yet";
+  const createdTime = new Date(lastUpdated).getTime();
+  if (Number.isNaN(createdTime)) return "No update yet";
+  const minutesAgo = Math.max(0, Math.round((Date.now() - createdTime) / (1000 * 60)));
+  if (minutesAgo < 2) return "Updated now";
+  if (minutesAgo < 60) return `${minutesAgo}m ago`;
+  const hoursAgo = Math.round(minutesAgo / 60);
+  if (hoursAgo < 24) return `${hoursAgo}h ago`;
+  return new Date(lastUpdated).toLocaleDateString();
+}
+
+function renderProductCards(station) {
+  if (isEvFilterActive()) {
+    return stationHasEvCharging(station) ? renderEvChargingCard(station, true) : "";
+  }
+
+  return getVisibleProducts(station).map(product => `
+    <div class="product-card ${activeProductFilter === product.key ? "is-emphasized" : ""}">
+      <div class="product-head">
+        <span class="product-name">
+          ${product.label}
+          <small>${product.code}</small>
+        </span>
+        <span class="badge ${getBadgeClass(product.status, "fuel")}">${product.status}</span>
+      </div>
+      <div class="product-price">${formatPrice(product.price)}</div>
+      <div class="product-time">${formatProductUpdated(product.lastUpdated)}</div>
+    </div>
+  `).join("");
+}
+
+function renderEvChargingCard(station, emphasized = false) {
+  const ev = normalizeEvCharging(station);
+  if (!stationHasEvCharging(station)) return "";
+  const portsText = Number.isFinite(ev.availablePorts)
+    ? `${ev.availablePorts} ${ev.availablePorts === 1 ? "Port" : "Ports"} Available`
+    : "Ports not updated";
+
+  return `
+    <div class="ev-card ${emphasized ? "is-emphasized" : ""}">
+      <div class="ev-card-top">
+        <div class="ev-title">⚡ EV Charging ${ev.availability}</div>
+        <span class="badge ev-badge">${ev.availability}</span>
+      </div>
+      <div class="ev-details">${ev.chargerType} • ${formatEvPrice(ev.pricePerKwh)}</div>
+      <div class="ev-ports">${portsText}</div>
+      <div class="product-time">${formatProductUpdated(ev.lastUpdated)}</div>
+    </div>
+  `;
+}
+
+function renderProductSummary(station) {
+  const fuelSummary = getStationProducts(station).map(product => `
+    <span class="product-chip">
+      ${product.code}
+      <span class="badge ${getBadgeClass(product.status, "fuel")}">${product.status}</span>
+    </span>
+  `).join("");
+  const ev = normalizeEvCharging(station);
+  const evSummary = stationHasEvCharging(station)
+    ? `<span class="product-chip">⚡ EV <span class="badge ${getBadgeClass(ev.availability, "ev")}">${ev.availability}</span></span>`
+    : "";
+  return fuelSummary + evSummary;
+}
+
+function renderProductReportFields(station) {
+  return getStationProducts(station).map(product => `
+    <label>${product.label} (${product.code}) price</label>
+    <input type="number" id="${product.key}-price-${station._id}" placeholder="${product.code} price" value="${Number.isFinite(product.price) ? product.price : ""}">
+
+    <label>${product.label} (${product.code}) availability</label>
+    <select id="${product.key}-status-${station._id}">
+      <option value="Available" ${product.status === "Available" ? "selected" : ""}>Available</option>
+      <option value="Low Stock" ${product.status === "Low Stock" ? "selected" : ""}>Low Stock</option>
+      <option value="Out of Stock" ${product.status === "Out of Stock" ? "selected" : ""}>Out of Stock</option>
+    </select>
+  `).join("") + renderEvReportFields(station);
+}
+
+function renderEvReportFields(station) {
+  const ev = normalizeEvCharging(station);
+  return `
+    <div class="ev-card">
+      <div class="ev-title">⚡ EV Charging</div>
+
+      <label>EV charging support</label>
+      <select id="ev-enabled-${station._id}">
+        <option value="true" ${ev.enabled ? "selected" : ""}>Enabled</option>
+        <option value="false" ${!ev.enabled ? "selected" : ""}>Disabled</option>
+      </select>
+
+      <label>Charger availability</label>
+      <select id="ev-availability-${station._id}">
+        <option value="Available" ${ev.availability === "Available" ? "selected" : ""}>Available</option>
+        <option value="Limited" ${ev.availability === "Limited" ? "selected" : ""}>Limited</option>
+        <option value="Unavailable" ${ev.availability === "Unavailable" ? "selected" : ""}>Unavailable</option>
+        <option value="Out of Service" ${ev.availability === "Out of Service" ? "selected" : ""}>Out of Service</option>
+      </select>
+
+      <label>Charger type</label>
+      <select id="ev-type-${station._id}">
+        ${["Fast Charger", "Type 2", "CCS", "CHAdeMO"].map(type => `<option value="${type}" ${ev.chargerType === type ? "selected" : ""}>${type}</option>`).join("")}
+      </select>
+
+      <label>Price per kWh</label>
+      <input type="number" id="ev-price-${station._id}" min="0" step="1" placeholder="EV price per kWh" value="${Number.isFinite(ev.pricePerKwh) ? ev.pricePerKwh : ""}">
+
+      <label>Available charging ports</label>
+      <input type="number" id="ev-ports-${station._id}" min="0" step="1" placeholder="Available ports" value="${Number.isFinite(ev.availablePorts) ? ev.availablePorts : ""}">
+    </div>
+  `;
+}
+
+function getPriceTrend(latestReport, previousReport) {
+  const productKey = activeProductFilter === "all" ? "pms" : activeProductFilter;
+  const latestPrice = getReportPrice(latestReport?.products?.[productKey] || latestReport);
+  const previousPrice = getReportPrice(previousReport?.products?.[productKey] || previousReport);
+
+  if (!Number.isFinite(latestPrice) || !Number.isFinite(previousPrice)) {
+    return {
+      label: "No history",
+      icon: "➖",
+      className: "trend-unknown",
+      previousText: formatPrice(previousPrice),
+      differenceText: "—"
+    };
+  }
+
+  const difference = latestPrice - previousPrice;
+  const absoluteDifference = Math.abs(difference);
+
+  if (difference > 0) {
+    return {
+      label: "Increased",
+      icon: "⬆️",
+      className: "trend-up",
+      previousText: formatPrice(previousPrice),
+      differenceText: `+₦${absoluteDifference}`
+    };
+  }
+
+  if (difference < 0) {
+    return {
+      label: "Decreased",
+      icon: "⬇️",
+      className: "trend-down",
+      previousText: formatPrice(previousPrice),
+      differenceText: `-₦${absoluteDifference}`
+    };
+  }
+
+  return {
+    label: "Unchanged",
+    icon: "➖",
+    className: "trend-flat",
+    previousText: formatPrice(previousPrice),
+    differenceText: "₦0"
+  };
+}
+
+function getStationDistanceText(station) {
+  const distance = getStationDistance(station);
+  return Number.isFinite(distance) ? distance.toFixed(2) + " km away" : "Distance unknown";
+}
+
+function getStationStatuses(report, station = {}) {
+  const product = getPrimaryProduct(station);
+
+  return {
+    fuelStatus: product.status,
+    openStatus:
+      report.isOpen === null || report.isOpen === undefined
+        ? "Unknown"
+        : report.isOpen
+        ? "Open"
+        : "Closed",
+    queueStatus: report.queueLevel ?? "—"
+  };
+}
+
+function isStationInVisibleMapArea(station) {
+  if (!map || !mapHasSettled) return true;
+  const point = getStationLatLng(station);
+  if (!point) return false;
+  const bounds = map.getBounds().pad(0.18);
+  if (bounds.contains([point.lat, point.lng])) return true;
+  if (!userLocation) return false;
+  return getStationDistance(station) <= 25;
+}
+
+function applyStationFilters(options = {}) {
+  if (!container) return;
+  let data = Array.isArray(allStations) ? [...allStations] : [];
+  container.innerHTML = "";
+
+  const searchText = searchInput.value.trim().toLowerCase();
+  const searchingCurrentLocation = isCurrentLocationSearch(searchText);
+
+  data = data.filter(station =>
+    searchingCurrentLocation ||
+    (station.name || "").toLowerCase().includes(searchText) ||
+    (station.area || "").toLowerCase().includes(searchText) ||
+    (station.brand || "").toLowerCase().includes(searchText) ||
+    getStationFullAddress(station).toLowerCase().includes(searchText) ||
+    (searchText.includes("ev") && stationHasEvCharging(station)) ||
+    (searchText.includes("charging") && stationHasEvCharging(station))
+  );
+
+  const selectedArea = normalizeAreaName(areaFilter.value);
+  if (selectedArea) {
+    data = data.filter(station => normalizeAreaName(station.area) === selectedArea);
+  }
+
+  if (isEvFilterActive()) {
+    data = data.filter(station => stationHasEvCharging(station));
+  }
+
+  if (fuelFilter.checked) {
+    data = data.filter(station => {
+      return stationHasAvailableProduct(station);
+    });
+  }
+
+  if (favoritesFilter.checked) {
+    data = data.filter(station => isFavoriteStation(station._id));
+  }
+
+  if (!searchText && !selectedArea && !favoritesFilter.checked) {
+    data = data.filter(isStationInVisibleMapArea);
+  }
+
+  data = sortStationsSmartly(data);
+  window.currentDisplayedStations = data;
+  updatePriceStats(data);
+  if (resultCount) {
+    resultCount.textContent = `${data.length} ${data.length === 1 ? "station" : "stations"}`;
+  }
+  if (sheetTitle) {
+    sheetTitle.textContent = userLocation ? "Nearby Fuel Stations" : "Fuel Stations";
+  }
+  if (sortModeLabel) {
+    sortModeLabel.textContent = stationSortMode === "cheapest" ? "Sorted by price" : "Sorted by distance";
+  }
+  updateMapStations(data, {
+    fitMap: Boolean(options.fitMap),
+    centerUser: Boolean(options.centerUser)
+  });
+
+  const cheapestStationId = bestPriceStationId || null;
+
+      if (data.length === 0) {
+        container.innerHTML = `<div class="empty">${stationLoadPending ? "Loading stations..." : "No stations found."}</div>`;
+        return;
+      }
+
+      data.forEach((station, index) => {
+        const report = station.latestReport || {};
+        const isFavorite = isFavoriteStation(station._id);
+        const isCheapest = cheapestStationId !== null && station._id === cheapestStationId;
+        const statuses = getStationStatuses(report, station);
+
+        const freshnessStatus = getFreshnessStatus(getStationLastUpdated(station));
+        const isOutdated = freshnessStatus === "🔴 Outdated";
+        const currentProduct = getPrimaryProduct(station);
+        const priceTrend = getPriceTrend(report, station.previousReport);
+        const distanceText = getStationDistanceText(station);
+        const fullAddress = getStationFullAddress(station);
+        const evCard = activeProductFilter === "all" ? renderEvChargingCard(station) : "";
+        const statusType = isEvFilterActive() ? "ev" : "fuel";
+        const energyIcon = isEvFilterActive() ? "⚡" : "⛽";
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.id = `station-card-${station._id}`;
+        if (selectedStationId === String(station._id)) {
+          card.classList.add("is-selected-station");
+        }
+        if (isCheapest) {
+          card.classList.add("cheapest-card");
+        }
+        if (isOutdated) {
+          card.classList.add("outdated-card");
+        }
+
+        card.innerHTML = `
+          <div class="card-top">
+            <div class="station-name">
+              ${station.name}
+            </div>
+          </div>
+          ${isCheapest ? `<div class="info"><span class="badge cheapest-badge">Best Price</span></div>` : ""}
+          <div class="station-meta">
+            <div class="info">📍 ${station.area}</div>
+            ${fullAddress ? `<div class="info">🏠 ${fullAddress}</div>` : ""}
+            ${fullAddress ? `<div class="info">🧭 ${getGeocodeConfidenceLabel(station)}</div>` : ""}
+            <div class="info">📏 ${distanceText}</div>
+            <div class="info">💰 ${currentProduct.code}: <strong>${formatActiveEnergyPrice(currentProduct.price)}</strong></div>
+            <div class="info">${freshnessStatus}</div>
+          </div>
+
+          <div class="product-grid">
+            ${renderProductCards(station)}
+          </div>
+          ${evCard}
+
+          ${isEvFilterActive() ? "" : `<div class="price-trend">
+            <div class="price-trend-header">
+              <span>${currentProduct.code} Price Trend</span>
+              <span class="trend-pill ${priceTrend.className}">${priceTrend.icon} ${priceTrend.label}</span>
+            </div>
+            <div class="trend-details">
+              <div>
+                <span class="trend-label">Previous price</span>
+                <span class="trend-value">${priceTrend.previousText}</span>
+              </div>
+              <div>
+                <span class="trend-label">Difference</span>
+                <span class="trend-value">${priceTrend.differenceText}</span>
+              </div>
+            </div>
+          </div>`}
+
+          <div class="station-meta">
+            <div class="info">${energyIcon} ${currentProduct.code} <span class="badge ${getBadgeClass(statuses.fuelStatus, statusType)}">${statuses.fuelStatus}</span></div>
+            <div class="info">🕒 <span class="badge ${getBadgeClass(statuses.openStatus,"open")}">${statuses.openStatus}</span></div>
+            <div class="info">🚗 <span class="badge ${getBadgeClass(statuses.queueStatus,"queue")}">${statuses.queueStatus}</span></div>
+          </div>
+
+          <div class="station-actions">
+            <a class="directions-btn" href="${getDirectionsUrl(station)}" target="_blank" rel="noopener">Directions</a>
+            <button class="follow-btn" onclick="toggleFavorite('${station._id}')">
+              ${isFavorite ? "⭐ Unfollow" : "⭐ Follow"}
+            </button>
+            ${getToken()
+              ? `<button onclick="toggleForm('${station._id}')">Report Update</button>`
+              : `<button class="auth-required-btn" onclick="requireAuthFor('report')">Report Update</button>`}
+          </div>
+          <div class="update-form" id="form-${station._id}">
+            ${renderProductReportFields(station)}
+
+            <select id="open-${station._id}">
+              <option value="">Open or Closed?</option>
+              <option value="true">Open</option>
+              <option value="false">Closed</option>
+            </select>
+
+            <select id="queue-${station._id}">
+              <option value="">Queue Level</option>
+              <option value="short">Short</option>
+              <option value="medium">Medium</option>
+              <option value="long">Long</option>
+            </select>
+
+            <button class="submit-btn" onclick="submitReport('${station._id}')">Submit Report</button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+}
+
+function loadStations(options = {}) {
+  stationLoadPending = true;
+  if (resultCount) resultCount.textContent = "Loading...";
+  fetch("http://localhost:3000/stations")
+    .then(res => res.json())
+    .then(data => {
+      allStations = Array.isArray(data) ? data : [];
+      auditStationMapData(allStations);
+      applyStationFilters(options);
+      stationLoadPending = false;
+      if (!autocompletePending) setSearchMeta("");
+    })
+    .catch(error => {
+      stationLoadPending = false;
+      console.error("Failed to load stations:", error);
+      setSearchMeta("Could not load stations. Please retry.");
+    });
+}
+
+function requestAutocomplete(inputValue) {
+  const text = String(inputValue || "").trim();
+  if (text.length < 2) {
+    addAddressSuggestionOptions([]);
+    if (!stationLoadPending) setSearchMeta("");
+    return;
+  }
+
+  autocompleteRequestState.requestId += 1;
+  const requestId = autocompleteRequestState.requestId;
+  autocompletePending = true;
+  setSearchMeta("Loading address suggestions...", true);
+
+  fetch(`http://localhost:3000/api/location/autocomplete?q=${encodeURIComponent(text)}`)
+    .then(res => res.ok ? res.json() : Promise.reject(new Error(`Autocomplete failed: ${res.status}`)))
+    .then(payload => {
+      if (requestId !== autocompleteRequestState.requestId) return;
+      const predictions = Array.isArray(payload.predictions) ? payload.predictions : [];
+      addAddressSuggestionOptions(predictions);
+      autocompletePending = false;
+      setSearchMeta(predictions.length ? "Suggestions powered by Google Places" : "No address suggestions found");
+    })
+    .catch(error => {
+      if (requestId !== autocompleteRequestState.requestId) return;
+      console.warn("Autocomplete fallback:", error);
+      autocompletePending = false;
+      addAddressSuggestionOptions([]);
+      if (!stationLoadPending) setSearchMeta("");
+    });
+}
+
+function requestAddressGeocode(inputValue) {
+  const text = String(inputValue || "").trim();
+  if (!text || text.length < 5) return;
+  if (geocodeFallbackCache.has(text.toLowerCase())) return;
+
+  geocodeRequestState.requestId += 1;
+  const requestId = geocodeRequestState.requestId;
+  setSearchMeta("Resolving address coordinates...", true);
+
+  fetch(`http://localhost:3000/api/location/geocode?q=${encodeURIComponent(text)}`)
+    .then(res => res.ok ? res.json() : Promise.reject(new Error(`Geocode failed: ${res.status}`)))
+    .then(payload => {
+      if (requestId !== geocodeRequestState.requestId) return;
+      const result = payload?.result || null;
+      const lat = Number(result?.latitude);
+      const lng = Number(result?.longitude);
+      const confidence = Number(result?.confidence);
+      geocodeFallbackCache.set(text.toLowerCase(), result || null);
+      if (map && Number.isFinite(lat) && Number.isFinite(lng) && confidence >= 0.55) {
+        map.flyTo([lat, lng], 14, { duration: 0.6 });
+      }
+      setSearchMeta("Address lookup ready");
+    })
+    .catch(error => {
+      if (requestId !== geocodeRequestState.requestId) return;
+      console.warn("Geocode lookup fallback:", error);
+      setSearchMeta("");
+    });
+}
+
+function toggleForm(stationId) {
+  const form = document.getElementById(`form-${stationId}`);
+  form.style.display = form.style.display === "block" ? "none" : "block";
+}
+
+function convertToBoolean(value) {
+  if (value === "true") return true;
+  if (value === "false") return false;
+  return null;
+}
+
+function submitReport(stationId) {
+
+  if (!getToken()) {
+    requireAuthFor("report");
+    return;
+  }
+
+  const products = fuelProducts.reduce((acc, product) => {
+    const priceInput = document.getElementById(`${product.key}-price-${stationId}`);
+    const statusInput = document.getElementById(`${product.key}-status-${stationId}`);
+    acc[product.key] = {
+      price: priceInput.value,
+      status: statusInput.value
+    };
+    return acc;
+  }, {});
+  const pmsProduct = products.pms || {};
+  const evCharging = {
+    enabled: document.getElementById(`ev-enabled-${stationId}`).value === "true",
+    availability: document.getElementById(`ev-availability-${stationId}`).value,
+    chargerType: document.getElementById(`ev-type-${stationId}`).value,
+    pricePerKwh: document.getElementById(`ev-price-${stationId}`).value,
+    availablePorts: document.getElementById(`ev-ports-${stationId}`).value
+  };
+  const isOpen = convertToBoolean(document.getElementById(`open-${stationId}`).value);
+  const queueLevel = document.getElementById(`queue-${stationId}`).value;
+
+  container.innerHTML = "Loading stations...";
+  
+  fetch("http://localhost:3000/reports", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + getToken()
+    },
+    body: JSON.stringify({
+      stationId,
+      products,
+      evCharging,
+      price: pmsProduct.price,
+      fuelAvailable: pmsProduct.status === "Available" || pmsProduct.status === "Low Stock",
+      isOpen,
+      queueLevel
+    })
+  })
+  .then(res => {
+    if (res.status === 401) {
+      alert("Session expired. Please login again.");
+      return;
+    }
+    return res.json();
+  })
+  .then(() => {
+    alert("Report submitted successfully");
+    loadStations();
+  });
+}
+
+function loadAlerts() {
+  fetch("http://localhost:3000/alerts")
+    .then(res => res.json())
+    .then(data => {
+      const alertBox = document.getElementById("alerts");
+      const oneHourAgoMs = Date.now() - (60 * 60 * 1000);
+      let recentAlerts = data.filter(alert => {
+        const createdAtMs = new Date(alert.createdAt).getTime();
+        return Number.isFinite(createdAtMs) && createdAtMs >= oneHourAgoMs;
+      });
+
+      if (favoriteAlertsFilter.checked) {
+        const favoriteStationIds = new Set(getFavoriteStationIds());
+        recentAlerts = recentAlerts.filter(alert =>
+          alert.stationId && favoriteStationIds.has(String(alert.stationId))
+        );
+      }
+
+      if (recentAlerts.length === 0) {
+        alertBox.innerHTML = "";
+        return;
+      }
+
+      alertBox.innerHTML = recentAlerts.map(alert => `
+        <div style="
+          background:#fee2e2;
+          color:#991b1b;
+          padding:12px;
+          margin-bottom:10px;
+          border-radius:12px;
+          font-weight:bold;
+        ">
+          🔥 ${alert.stationName} (${alert.area}) just got fuel
+          <br>
+          <small>${new Date(alert.createdAt).toLocaleTimeString()}</small>
+        </div>
+      `).join("");
+    });
+}
+loadAlerts();
+setInterval(loadAlerts, 10000);
+function goToLogin() {
+  window.location.href = loginUrl;
+}
+
+function requireAuthFor(action) {
+  const messages = {
+    report: [
+      "Login to report prices",
+      "Anyone can browse stations, search, check prices, and use the map. Login is required only when submitting a new fuel price report."
+    ],
+    favorites: [
+      "Login to save favorites",
+      "Browsing is open. Login or sign up when you want Fuel Tracker to remember your favorite stations."
+    ],
+    owner: [
+      "Login for station owner tools",
+      "Claiming stations, editing station information, and using the owner dashboard require an authenticated station account."
+    ]
+  };
+  const [title, message] = messages[action] || messages.report;
+  showAuthModal(title, message);
+}
+
+function getSheetHeights() {
+  const viewportHeight = window.innerHeight || 720;
+  const workspaceHeight = discoveryMap?.getBoundingClientRect().height || viewportHeight;
+  return {
+    collapsed: 96,
+    mid: Math.min(Math.round(workspaceHeight * 0.48), workspaceHeight - 76),
+    expanded: Math.min(Math.round(workspaceHeight * 0.82), workspaceHeight - 32)
+  };
+}
+
+function setBottomSheetHeight(height, dragging = false) {
+  if (!discoveryMap || !bottomSheet) return;
+  const heights = getSheetHeights();
+  const nextHeight = Math.max(heights.collapsed, Math.min(height, heights.expanded));
+  discoveryMap.style.setProperty("--sheet-height", `${nextHeight}px`);
+  bottomSheet.classList.toggle("is-dragging", dragging);
+  if (map) {
+    window.requestAnimationFrame(() => map.invalidateSize({ animate: false }));
+  }
+}
+
+function snapBottomSheet(height) {
+  const heights = getSheetHeights();
+  const points = [heights.collapsed, heights.mid, heights.expanded];
+  const nearest = points.reduce((best, point) => {
+    return Math.abs(point - height) < Math.abs(best - height) ? point : best;
+  }, points[0]);
+  setBottomSheetHeight(nearest, false);
+}
+
+function initBottomSheet() {
+  if (!bottomSheet || !sheetHandle) return;
+  let startY = 0;
+  let startHeight = getSheetHeights().collapsed;
+  let activePointerId = null;
+  let dragDistance = 0;
+  let isDragging = false;
+
+  setBottomSheetHeight(getSheetHeights().collapsed);
+
+  sheetHandle.addEventListener("click", () => {
+    if (dragDistance > 12) return;
+    const heights = getSheetHeights();
+    const currentHeight = bottomSheet.getBoundingClientRect().height;
+    const target = currentHeight < heights.mid ? heights.mid : heights.collapsed;
+    setBottomSheetHeight(target);
+  });
+
+  function startDrag(event) {
+    if (activePointerId !== null) return;
+    activePointerId = event.pointerId;
+    startY = event.clientY;
+    startHeight = bottomSheet.getBoundingClientRect().height;
+    dragDistance = 0;
+    isDragging = false;
+    sheetHandle.setPointerCapture(event.pointerId);
+    bottomSheet.classList.add("is-dragging");
+  }
+
+  function moveDrag(event) {
+    if (activePointerId !== event.pointerId) return;
+    const deltaY = startY - event.clientY;
+    dragDistance = Math.max(dragDistance, Math.abs(deltaY));
+    if (Math.abs(deltaY) > 3) isDragging = true;
+    setBottomSheetHeight(startHeight + deltaY, true);
+    if (isDragging) event.preventDefault();
+  }
+
+  function finishDrag(event) {
+    if (activePointerId !== event.pointerId) return;
+    const currentHeight = bottomSheet.getBoundingClientRect().height;
+    const movedEnough = dragDistance > 8;
+    activePointerId = null;
+    bottomSheet.classList.remove("is-dragging");
+    if (movedEnough) {
+      snapBottomSheet(currentHeight);
+    }
+  }
+
+  sheetHandle.addEventListener("pointerdown", startDrag);
+  sheetHandle.addEventListener("pointermove", moveDrag);
+  sheetHandle.addEventListener("pointerup", finishDrag);
+  sheetHandle.addEventListener("pointercancel", finishDrag);
+
+  window.addEventListener("resize", () => {
+    const currentHeight = bottomSheet.getBoundingClientRect().height;
+    snapBottomSheet(currentHeight);
+  });
+}
+
+
+
+searchInput.addEventListener("input", () => {
+  if (autocompleteTimer) clearTimeout(autocompleteTimer);
+  autocompleteTimer = setTimeout(() => requestAutocomplete(searchInput.value), 250);
+  if (isCurrentLocationSearch(searchInput.value) && !locationSet) {
+    requestUserLocation();
+    return;
+  }
+  applyStationFilters();
+});
+searchInput.addEventListener("change", () => {
+  requestAddressGeocode(searchInput.value);
+});
+fuelFilter.addEventListener("change", () => applyStationFilters());
+areaFilter.addEventListener("change", () => applyStationFilters({ fitMap: true }));
+productTabs.addEventListener("click", event => {
+  const tab = event.target.closest(".product-tab");
+  if (!tab) return;
+  activeProductFilter = tab.dataset.product || "all";
+  productTabs.querySelectorAll(".product-tab").forEach(button => {
+    button.classList.toggle("active", button === tab);
+  });
+  applyStationFilters();
+});
+favoritesFilter.addEventListener("change", () => {
+  if (favoritesFilter.checked && !getToken()) {
+    favoritesFilter.checked = false;
+    requireAuthFor("favorites");
+  }
+  applyStationFilters();
+});
+favoriteAlertsFilter.addEventListener("change", loadAlerts);
+mapLocateBtn.addEventListener("click", () => {
+  if (userLocation && map) {
+    updateUserLocationMarker();
+    map.flyTo([userLocation.lat, userLocation.lng], 14, { duration: 0.7 });
+    applyStationFilters({ centerUser: true });
+    return;
+  }
+  requestUserLocation();
+});
+function updateUserUI() {
+  const userBar = document.getElementById("userBar");
+
+  if (!userBar) return;
+
+  userBar.innerHTML = ""; // 🔥 clear first
+
+  if (getToken()) {
+    userBar.innerHTML = `
+      <span>Logged in ✅</span>
+      <a class="auth-link" href="/partner/login">Owner Portal</a>
+      <button onclick="logout()">Logout</button>
+    `;
+  } else {
+    userBar.innerHTML = `
+      <a class="auth-link" href="${loginUrl}">Log In</a>
+      <a class="auth-link signup-link" href="${signupUrl}">Sign Up</a>
+    `;
+  }
+}
+function logout() {
+  localStorage.removeItem("token");
+  alert("Logged out");
+  updateUserUI();
+  applyStationFilters();
+}
+function refreshToken() {
+  return localStorage.getItem("token");
+}
+
+window.onload = function () {
+  initMap();
+  initBottomSheet();
+  updateUserUI();
+  loadStations();
+};
+</script>
+
+</body>
+</html>

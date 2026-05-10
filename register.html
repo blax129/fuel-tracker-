@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+  <style>
+    .back-home-corner {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      display: inline-block;
+      padding: 10px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      color: #0f766e;
+      background: #ffffff;
+      text-decoration: none;
+      font-weight: 700;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+<a class="back-home-corner" href="home-header.html">&larr; Back</a>
+
+<h2>Register</h2>
+
+<input id="name" placeholder="Name"><br><br>
+<input id="email" placeholder="Email"><br><br>
+<input id="password" type="password" placeholder="Password"><br><br>
+
+<button onclick="register()">Register</button>
+
+<p id="msg"></p>
+
+<script>
+function register() {
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  fetch("http://localhost:3000/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ name, email, password })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("msg").innerText = data.message;
+  });
+}
+</script>
+
+</body>
+</html>

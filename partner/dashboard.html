@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Partner Dashboard - Fuel Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #f4f7f8;
+      color: #14213d;
+      font-family: Arial, sans-serif;
+    }
+    .layout {
+      min-height: 100vh;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .topbar-inner {
+      max-width: 1180px;
+      min-height: 64px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #0f172a;
+      font-size: 16px;
+      font-weight: 900;
+    }
+    .mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: #0f766e;
+      color: #ffffff;
+    }
+    .logout {
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      background: #ffffff;
+      color: #334155;
+      cursor: pointer;
+      font-weight: 900;
+    }
+    .main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px 16px 30px;
+    }
+    .hero {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 16px;
+      padding: 22px;
+      border-radius: 18px;
+      background: #0f766e;
+      color: #ffffff;
+    }
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+    .hero p {
+      margin: 8px 0 0;
+      color: rgba(255, 255, 255, 0.86);
+      line-height: 1.5;
+    }
+    .status-pill {
+      width: fit-content;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .status-pill.approved {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .notice {
+      display: none;
+      margin-bottom: 16px;
+      padding: 14px;
+      border: 1px solid #fde68a;
+      border-radius: 14px;
+      background: #fffbeb;
+      color: #92400e;
+      font-weight: 900;
+    }
+    .notice.is-visible { display: block; }
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+    .card {
+      padding: 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+    }
+    .card h2 {
+      margin: 0 0 12px;
+      color: #0f172a;
+      font-size: 18px;
+    }
+    .fuel-grid {
+      display: grid;
+      gap: 12px;
+    }
+    .fuel-card {
+      padding: 13px;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: #f8fafc;
+    }
+    .ev-card {
+      border-color: #bae6fd;
+      background: linear-gradient(135deg, #ecfeff 0%, #f0fdf4 100%);
+      box-shadow: 0 10px 20px rgba(14, 165, 233, 0.08);
+    }
+    .ev-card h3 {
+      color: #0369a1;
+    }
+    .ev-card p {
+      color: #0f766e;
+    }
+    .fuel-card h3 {
+      margin: 0 0 2px;
+      color: #0f172a;
+      font-size: 17px;
+    }
+    .fuel-card p {
+      margin: 0 0 10px;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    input, select, textarea {
+      width: 100%;
+      min-height: 44px;
+      margin-top: 6px;
+      padding: 10px 11px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      background: #ffffff;
+      font-size: 15px;
+    }
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #0f766e;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+    }
+    .primary-btn {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 14px;
+      border: none;
+      border-radius: 12px;
+      background: #0f766e;
+      color: #ffffff;
+      cursor: pointer;
+      font-weight: 900;
+    }
+    .primary-btn:hover { background: #115e59; }
+    .primary-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.56;
+    }
+    .photo-preview {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .photo-preview img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+    }
+    .status-text {
+      min-height: 20px;
+      margin: 10px 0 0;
+      color: #64748b;
+      font-size: 14px;
+    }
+    .status-text.error { color: #991b1b; }
+    .status-text.success { color: #166534; }
+    @media (min-width: 760px) {
+      .hero {
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        padding: 30px;
+      }
+      h1 { font-size: 44px; }
+      .grid { grid-template-columns: 1.35fr 0.85fr; align-items: start; }
+      .fuel-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand"><span class="mark">⛽</span> Fuel Partner Dashboard</div>
+        <button class="logout" id="logoutBtn" type="button">Logout</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="hero">
+        <div>
+          <h1 id="stationTitle">Manage Your Station</h1>
+          <p id="stationSubtitle">Update prices, stock status, operating hours, and station photos from one mobile-friendly dashboard.</p>
+        </div>
+        <span class="status-pill" id="accountStatus">Pending Verification</span>
+      </section>
+
+      <div class="notice" id="pendingNotice">Your station account is awaiting approval.</div>
+
+      <div class="grid">
+        <section class="card">
+          <h2>Fuel Updates</h2>
+          <form id="fuelForm">
+            <div class="fuel-grid" id="fuelGrid"></div>
+            <button class="primary-btn" id="fuelSubmitBtn" type="submit">Publish Fuel Update</button>
+            <p class="status-text" id="fuelMessage"></p>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2>Station Profile</h2>
+          <form id="profileForm">
+            <label for="operatingHours">Operating Hours</label>
+            <textarea id="operatingHours" placeholder="Mon-Sat 6:00 AM - 10:00 PM&#10;Sunday 8:00 AM - 8:00 PM"></textarea>
+
+            <label for="stationPhotos">Upload Station Photos</label>
+            <input id="stationPhotos" type="file" accept="image/*" multiple>
+            <div class="photo-preview" id="photoPreview"></div>
+
+            <button class="primary-btn" type="submit">Save Station Profile</button>
+            <p class="status-text" id="profileMessage"></p>
+          </form>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const fuelProducts = [
+      { key: "pms", label: "Petrol", code: "PMS" },
+      { key: "ago", label: "Diesel", code: "AGO" },
+      { key: "dpk", label: "Kerosene", code: "DPK" },
+      { key: "lpg", label: "Cooking Gas", code: "LPG" }
+    ];
+    const token = localStorage.getItem("partnerToken");
+    const fuelGrid = document.getElementById("fuelGrid");
+    const fuelForm = document.getElementById("fuelForm");
+    const profileForm = document.getElementById("profileForm");
+    const fuelMessage = document.getElementById("fuelMessage");
+    const profileMessage = document.getElementById("profileMessage");
+    const fuelSubmitBtn = document.getElementById("fuelSubmitBtn");
+    const pendingNotice = document.getElementById("pendingNotice");
+    const accountStatus = document.getElementById("accountStatus");
+    const photoPreview = document.getElementById("photoPreview");
+    let currentUser = null;
+    let photoData = [];
+
+    if (!token) {
+      window.location.href = "/partner/login";
+    }
+
+    function setMessage(element, text, type = "") {
+      element.className = "status-text " + type;
+      element.textContent = text;
+    }
+
+    function renderFuelCards() {
+      fuelGrid.innerHTML = fuelProducts.map(product => `
+        <section class="fuel-card">
+          <h3>${product.label}</h3>
+          <p>${product.code}</p>
+          <label for="${product.key}Price">${product.code} Price</label>
+          <input id="${product.key}Price" type="number" min="0" step="1" placeholder="Enter ${product.code} price">
+          <label for="${product.key}Status">Availability</label>
+          <select id="${product.key}Status">
+            <option value="Available">Available</option>
+            <option value="Low Stock">Low Stock</option>
+            <option value="Out of Stock">Out of Stock</option>
+          </select>
+        </section>
+      `).join("") + `
+        <section class="fuel-card ev-card">
+          <h3>⚡ EV Charging</h3>
+          <p>Electric charging</p>
+          <label for="evEnabled">EV Charging Support</label>
+          <select id="evEnabled">
+            <option value="true">Enabled</option>
+            <option value="false" selected>Disabled</option>
+          </select>
+
+          <label for="evAvailability">Charger Availability</label>
+          <select id="evAvailability">
+            <option value="Available">Available</option>
+            <option value="Limited">Limited</option>
+            <option value="Unavailable" selected>Unavailable</option>
+            <option value="Out of Service">Out of Service</option>
+          </select>
+
+          <label for="evChargerType">Charger Type</label>
+          <select id="evChargerType">
+            <option>Fast Charger</option>
+            <option>Type 2</option>
+            <option>CCS</option>
+            <option>CHAdeMO</option>
+          </select>
+
+          <label for="evPrice">Price per kWh</label>
+          <input id="evPrice" type="number" min="0" step="1" placeholder="Example: 350">
+
+          <label for="evPorts">Available Charging Ports</label>
+          <input id="evPorts" type="number" min="0" step="1" placeholder="Example: 2">
+        </section>
+      `;
+    }
+
+    function applyEvCharging(evCharging = {}) {
+      document.getElementById("evEnabled").value = evCharging.enabled ? "true" : "false";
+      document.getElementById("evAvailability").value = evCharging.availability || "Unavailable";
+      document.getElementById("evChargerType").value = evCharging.chargerType || "Fast Charger";
+      document.getElementById("evPrice").value = Number.isFinite(Number(evCharging.pricePerKwh)) ? evCharging.pricePerKwh : "";
+      document.getElementById("evPorts").value = Number.isFinite(Number(evCharging.availablePorts)) ? evCharging.availablePorts : "";
+    }
+
+    function applyUser(user) {
+      currentUser = user;
+      const status = user.accountStatus || "Approved";
+      const station = user.stationDraft || {};
+      document.getElementById("stationTitle").textContent = station.name || "Manage Your Station";
+      document.getElementById("stationSubtitle").textContent = station.address || "Update prices, stock status, operating hours, and station photos.";
+      accountStatus.textContent = status;
+      accountStatus.classList.toggle("approved", status === "Approved");
+      pendingNotice.classList.toggle("is-visible", status !== "Approved");
+      fuelSubmitBtn.disabled = status !== "Approved";
+      if (status !== "Approved") {
+        setMessage(fuelMessage, "Fuel publishing unlocks after account approval.", "error");
+      }
+      document.getElementById("operatingHours").value = user.partnerProfile?.operatingHours || "";
+      applyEvCharging(user.station?.evCharging || {});
+      photoData = Array.isArray(user.partnerProfile?.photos) ? user.partnerProfile.photos : [];
+      renderPhotoPreview();
+    }
+
+    function renderPhotoPreview() {
+      photoPreview.innerHTML = photoData.map(src => `<img src="${src}" alt="Station photo preview">`).join("");
+    }
+
+    renderFuelCards();
+
+    fetch("/partner/me", {
+      headers: { "Authorization": "Bearer " + token }
+    })
+    .then(async res => {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || "Session expired");
+      return data.user;
+    })
+    .then(applyUser)
+    .catch(() => {
+      localStorage.removeItem("partnerToken");
+      window.location.href = "/partner/login";
+    });
+
+    document.getElementById("stationPhotos").addEventListener("change", event => {
+      const files = Array.from(event.target.files || []).slice(0, 4);
+      photoData = [];
+      if (files.length === 0) {
+        renderPhotoPreview();
+        return;
+      }
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          photoData.push(reader.result);
+          renderPhotoPreview();
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    fuelForm.addEventListener("submit", event => {
+      event.preventDefault();
+      if (!currentUser || currentUser.accountStatus !== "Approved") {
+        setMessage(fuelMessage, "Your station account is awaiting approval.", "error");
+        return;
+      }
+
+      const products = fuelProducts.reduce((acc, product) => {
+        acc[product.key] = {
+          price: document.getElementById(product.key + "Price").value,
+          status: document.getElementById(product.key + "Status").value
+        };
+        return acc;
+      }, {});
+      const evCharging = {
+        enabled: document.getElementById("evEnabled").value === "true",
+        availability: document.getElementById("evAvailability").value,
+        chargerType: document.getElementById("evChargerType").value,
+        pricePerKwh: document.getElementById("evPrice").value,
+        availablePorts: document.getElementById("evPorts").value
+      };
+
+      setMessage(fuelMessage, "Publishing fuel update...");
+      fetch("/reports", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+          stationId: currentUser.stationId,
+          products,
+          evCharging,
+          price: products.pms.price,
+          fuelAvailable: products.pms.status === "Available" || products.pms.status === "Low Stock",
+          isOpen: true,
+          queueLevel: "short"
+        })
+      })
+      .then(async res => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || "Could not publish update");
+        return data;
+      })
+      .then(() => setMessage(fuelMessage, "Fuel update published.", "success"))
+      .catch(err => setMessage(fuelMessage, err.message, "error"));
+    });
+
+    profileForm.addEventListener("submit", event => {
+      event.preventDefault();
+      setMessage(profileMessage, "Saving station profile...");
+      fetch("/partner/station-profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+          operatingHours: document.getElementById("operatingHours").value,
+          photos: photoData
+        })
+      })
+      .then(async res => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || "Could not save profile");
+        return data;
+      })
+      .then(() => setMessage(profileMessage, "Station profile saved.", "success"))
+      .catch(err => setMessage(profileMessage, err.message, "error"));
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("partnerToken");
+      fetch("/partner/logout", { method: "POST" })
+        .finally(() => {
+          window.location.href = "/partner/login";
+        });
+    });
+  </script>
+</body>
+</html>

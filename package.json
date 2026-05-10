@@ -1,0 +1,25 @@
+{
+  "name": "fuel-station-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "geocode:stations": "node scripts/geocode-stations.js --provider google --dry-run",
+    "geocode:stations:apply": "node scripts/geocode-stations.js --provider google --apply --threshold 0.68 --delay-ms 1100",
+    "geocode:stations:retry-failed": "node scripts/geocode-stations.js --provider google --dry-run --failed-report geocode-dry-run.json",
+    "geocode:stations:retry-failed:apply": "node scripts/geocode-stations.js --provider google --apply --threshold 0.68 --delay-ms 1100 --failed-report geocode-dry-run.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongodb": "^7.2.0"
+  }
+}

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Station Owner Signup - Fuel Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #f5f7f8;
+      color: #14213d;
+      font-family: Arial, sans-serif;
+    }
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #0f172a;
+      font-weight: 900;
+      text-decoration: none;
+    }
+    .mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: #0f766e;
+      color: #ffffff;
+    }
+    .login-link {
+      color: #0f766e;
+      font-size: 14px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+    .hero {
+      margin-bottom: 16px;
+      padding: 22px;
+      border-radius: 18px;
+      background: #0f766e;
+      color: #ffffff;
+    }
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+    .hero p {
+      max-width: 680px;
+      margin: 10px 0 0;
+      color: rgba(255, 255, 255, 0.86);
+      line-height: 1.5;
+    }
+    .card {
+      padding: 18px;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      background: #ffffff;
+      box-shadow: 0 14px 36px rgba(15, 23, 42, 0.08);
+      animation: riseIn 0.28s ease both;
+    }
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+    label {
+      display: block;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    input, select {
+      width: 100%;
+      min-height: 46px;
+      margin-top: 6px;
+      padding: 11px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      background: #f8fafc;
+      font-size: 15px;
+    }
+    input:focus, select:focus {
+      border-color: #0f766e;
+      background: #ffffff;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+    }
+    .claim-box {
+      margin: 14px 0;
+      padding: 14px;
+      border: 1px solid #ccfbf1;
+      border-radius: 14px;
+      background: #ecfdf5;
+    }
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+    }
+    .check-row input {
+      width: 18px;
+      min-height: 18px;
+      margin: 0;
+      accent-color: #0f766e;
+    }
+    .station-results {
+      display: none;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .station-results.is-visible {
+      display: grid;
+    }
+    .station-option {
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      background: #ffffff;
+      cursor: pointer;
+      text-align: left;
+    }
+    .station-option.is-selected {
+      border-color: #0f766e;
+      background: #ccfbf1;
+    }
+    .station-option strong {
+      display: block;
+      color: #0f172a;
+      font-size: 14px;
+    }
+    .station-option span {
+      color: #64748b;
+      font-size: 13px;
+    }
+    button {
+      width: 100%;
+      min-height: 50px;
+      margin-top: 16px;
+      border: none;
+      border-radius: 12px;
+      background: #0f766e;
+      color: #ffffff;
+      cursor: pointer;
+      font-weight: 900;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    button:hover {
+      background: #115e59;
+      transform: translateY(-1px);
+    }
+    .success {
+      display: none;
+      margin-top: 14px;
+      padding: 16px;
+      border: 1px solid #bbf7d0;
+      border-radius: 14px;
+      background: #f0fdf4;
+      color: #166534;
+      font-weight: 900;
+    }
+    .success.is-visible { display: block; }
+    #message {
+      min-height: 20px;
+      margin: 12px 0 0;
+      color: #64748b;
+      font-size: 14px;
+      text-align: center;
+    }
+    #message.error { color: #991b1b; }
+    .helper {
+      margin: 14px 0 0;
+      color: #64748b;
+      font-size: 14px;
+      text-align: center;
+    }
+    .helper a {
+      color: #0f766e;
+      font-weight: 900;
+      text-decoration: none;
+    }
+    @media (min-width: 760px) {
+      .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .span-2 { grid-column: span 2; }
+      .hero { padding: 34px; }
+      h1 { font-size: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a class="brand" href="/index.html"><span class="mark">⛽</span> Fuel Partner Dashboard</a>
+      <a class="login-link" href="/partner/login">Sign In</a>
+    </header>
+
+    <section class="hero">
+      <h1>Manage Your Station on Fuel Tracker.</h1>
+      <p>Create a station owner account, claim an existing listing, and keep PMS, AGO, DPK, and LPG updates ready for drivers.</p>
+    </section>
+
+    <section class="card">
+      <form id="signupForm">
+        <div class="form-grid">
+          <label>Full Name
+            <input id="fullName" type="text" autocomplete="name" required>
+          </label>
+          <label>Email Address
+            <input id="email" type="email" autocomplete="email" required>
+          </label>
+          <label>Phone Number
+            <input id="phone" type="tel" autocomplete="tel" required>
+          </label>
+          <label>Fuel Brand
+            <input id="fuelBrand" type="text" placeholder="NNPC, TotalEnergies, Mobil..." required>
+          </label>
+          <label class="span-2">Station Name
+            <input id="stationName" type="text" required>
+          </label>
+          <label class="span-2">Station Address
+            <input id="stationAddress" type="text" required>
+          </label>
+          <label>Password
+            <input id="password" type="password" autocomplete="new-password" required>
+          </label>
+          <label>Confirm Password
+            <input id="confirmPassword" type="password" autocomplete="new-password" required>
+          </label>
+        </div>
+
+        <div class="claim-box">
+          <label class="check-row">
+            <input id="claimExistingStation" type="checkbox">
+            Claim Existing Station
+          </label>
+          <label id="stationSearchWrap" style="display:none; margin-top:12px;">Search existing stations
+            <input id="stationSearch" type="text" placeholder="Search by station name, brand, area, or address">
+          </label>
+          <div class="station-results" id="stationResults"></div>
+        </div>
+
+        <button type="submit" id="signupBtn">Create Account</button>
+      </form>
+
+      <div class="success" id="successBox">Your station account is awaiting approval.</div>
+      <p class="helper">Already have an account? <a href="/partner/login">Log In</a></p>
+      <p id="message"></p>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById("signupForm");
+    const message = document.getElementById("message");
+    const successBox = document.getElementById("successBox");
+    const signupBtn = document.getElementById("signupBtn");
+    const claimExistingStation = document.getElementById("claimExistingStation");
+    const stationSearchWrap = document.getElementById("stationSearchWrap");
+    const stationSearch = document.getElementById("stationSearch");
+    const stationResults = document.getElementById("stationResults");
+    const partnerAuth = {
+      loginPath: "/partner/login",
+      pendingPath: "/partner/pending"
+    };
+    let stations = [];
+    let selectedStation = null;
+
+    fetch("/stations")
+      .then(res => res.json())
+      .then(data => { stations = Array.isArray(data) ? data : []; })
+      .catch(() => { stations = []; });
+
+    function renderStationResults() {
+      const query = stationSearch.value.trim().toLowerCase();
+      if (!claimExistingStation.checked || query.length < 2) {
+        stationResults.classList.remove("is-visible");
+        stationResults.innerHTML = "";
+        return;
+      }
+
+      const matches = stations.filter(station => {
+        const text = `${station.name || ""} ${station.brand || ""} ${station.area || ""} ${station.address || ""}`.toLowerCase();
+        return text.includes(query);
+      }).slice(0, 6);
+
+      stationResults.innerHTML = matches.map(station => `
+        <button class="station-option ${selectedStation?._id === station._id ? "is-selected" : ""}" type="button" data-id="${station._id}">
+          <strong>${station.name}</strong>
+          <span>${station.brand || "Fuel Station"} · ${station.area || ""}</span>
+        </button>
+      `).join("");
+      stationResults.classList.toggle("is-visible", matches.length > 0);
+    }
+
+    claimExistingStation.addEventListener("change", () => {
+      stationSearchWrap.style.display = claimExistingStation.checked ? "block" : "none";
+      selectedStation = null;
+      renderStationResults();
+    });
+
+    stationSearch.addEventListener("input", renderStationResults);
+    stationResults.addEventListener("click", event => {
+      const option = event.target.closest(".station-option");
+      if (!option) return;
+      selectedStation = stations.find(station => station._id === option.dataset.id);
+      if (selectedStation) {
+        document.getElementById("stationName").value = selectedStation.name || "";
+        document.getElementById("stationAddress").value = selectedStation.fullAddress || selectedStation.address || "";
+        document.getElementById("fuelBrand").value = selectedStation.brand || "";
+      }
+      renderStationResults();
+    });
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      message.className = "";
+      message.textContent = "Submitting account for verification...";
+      signupBtn.disabled = true;
+
+      fetch("/partner/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: document.getElementById("fullName").value.trim(),
+          email: document.getElementById("email").value.trim(),
+          phone: document.getElementById("phone").value.trim(),
+          stationName: document.getElementById("stationName").value.trim(),
+          stationAddress: document.getElementById("stationAddress").value.trim(),
+          fuelBrand: document.getElementById("fuelBrand").value.trim(),
+          password: document.getElementById("password").value,
+          confirmPassword: document.getElementById("confirmPassword").value,
+          claimExistingStation: claimExistingStation.checked,
+          stationId: selectedStation?._id || null
+        })
+      })
+      .then(async res => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || "Signup failed");
+        return data;
+      })
+      .then(data => {
+        successBox.textContent = data.message || "Your station account is awaiting approval.";
+        successBox.classList.add("is-visible");
+        message.textContent = "Opening pending verification status...";
+        form.reset();
+        selectedStation = null;
+        stationSearchWrap.style.display = "none";
+        setTimeout(() => {
+          window.location.href = partnerAuth.pendingPath;
+        }, 900);
+      })
+      .catch(err => {
+        message.className = "error";
+        message.textContent = err.message;
+      })
+      .finally(() => {
+        signupBtn.disabled = false;
+      });
+    });
+  </script>
+</body>
+</html>

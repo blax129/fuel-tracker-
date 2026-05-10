@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Station Dashboard - Fuel Tracker</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f3;
+      margin: 0;
+      padding: 20px;
+      color: #222;
+    }
+
+    .app {
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .header {
+      background: #0f766e;
+      color: white;
+      padding: 22px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 26px;
+    }
+
+    .header p {
+      margin: 6px 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+      border-left: 5px solid #0f766e;
+    }
+
+    .product-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .product-panel {
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #f8fafc;
+    }
+
+    .ev-panel {
+      border-color: #bae6fd;
+      background: linear-gradient(135deg, #ecfeff 0%, #f0fdf4 100%);
+    }
+
+    .ev-panel h2 {
+      color: #0369a1;
+    }
+
+    .product-panel h2 {
+      margin: 0 0 4px;
+      color: #111827;
+      font-size: 16px;
+    }
+
+    .product-panel p {
+      margin: 0 0 8px;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    input, select {
+      display: block;
+      margin-top: 6px;
+      padding: 11px;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    button {
+      margin-top: 14px;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #0f766e;
+      color: white;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #115e59;
+    }
+
+    .secondary-btn {
+      background: #374151;
+      margin-left: 8px;
+    }
+
+    .secondary-btn:hover {
+      background: #1f2937;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #374151;
+      min-height: 20px;
+    }
+
+    @media (min-width: 700px) {
+      .app {
+        max-width: 760px;
+      }
+
+      .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <h1>Station Dashboard</h1>
+      <p>Submit live fuel updates for your station</p>
+    </div>
+
+    <div class="panel">
+      <form id="reportForm">
+        <div class="product-grid" id="productGrid"></div>
+
+        <label for="isOpen">Station Status</label>
+        <select id="isOpen" required>
+          <option value="">Select option</option>
+          <option value="true">Open</option>
+          <option value="false">Closed</option>
+        </select>
+
+        <label for="queueLevel">Queue Level</label>
+        <select id="queueLevel" required>
+          <option value="">Select queue level</option>
+          <option value="short">Short</option>
+          <option value="medium">Medium</option>
+          <option value="long">Long</option>
+        </select>
+
+        <button type="submit">Submit Report</button>
+        <button class="secondary-btn" type="button" id="goHomeBtn">Back to Home</button>
+      </form>
+
+      <div class="status" id="statusMessage"></div>
+    </div>
+  </div>
+
+  <script>
+    function parseJwt(token) {
+      try {
+        const payload = token.split(".")[1];
+        if (!payload) return null;
+        const decoded = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+        return JSON.parse(decoded);
+      } catch (err) {
+        console.error("JWT parse error:", err);
+        return null;
+      }
+    }
+
+    function toBoolean(value) {
+      return value === "true";
+    }
+
+    const fuelProducts = [
+      { key: "pms", label: "Petrol", code: "PMS" },
+      { key: "ago", label: "Diesel", code: "AGO" },
+      { key: "dpk", label: "Kerosene", code: "DPK" },
+      { key: "lpg", label: "Cooking Gas", code: "LPG" }
+    ];
+
+    const token = localStorage.getItem("token");
+    const user = token ? parseJwt(token) : null;
+
+    if (!token || !user) {
+      window.location.href = "login.html";
+    }
+
+    if (!user || user.role !== "station") {
+      alert("This page is for station accounts only.");
+      window.location.href = "index.html";
+    }
+
+    if (!user || !user.stationId) {
+      alert("No station is linked to this account.");
+      window.location.href = "index.html";
+    }
+
+    const form = document.getElementById("reportForm");
+    const statusMessage = document.getElementById("statusMessage");
+    const goHomeBtn = document.getElementById("goHomeBtn");
+    const productGrid = document.getElementById("productGrid");
+
+    productGrid.innerHTML = fuelProducts.map(product => `
+      <section class="product-panel">
+        <h2>${product.label}</h2>
+        <p>${product.code}</p>
+        <label for="${product.key}Price">Price</label>
+        <input id="${product.key}Price" type="number" min="0" step="1" placeholder="${product.code} price">
+
+        <label for="${product.key}Status">Availability</label>
+        <select id="${product.key}Status" required>
+          <option value="Available">Available</option>
+          <option value="Low Stock">Low Stock</option>
+          <option value="Out of Stock">Out of Stock</option>
+        </select>
+      </section>
+    `).join("") + `
+      <section class="product-panel ev-panel">
+        <h2>⚡ EV Charging</h2>
+        <p>Electric charging</p>
+
+        <label for="evEnabled">EV Charging Support</label>
+        <select id="evEnabled">
+          <option value="true">Enabled</option>
+          <option value="false" selected>Disabled</option>
+        </select>
+
+        <label for="evAvailability">Charger Availability</label>
+        <select id="evAvailability">
+          <option value="Available">Available</option>
+          <option value="Limited">Limited</option>
+          <option value="Unavailable" selected>Unavailable</option>
+          <option value="Out of Service">Out of Service</option>
+        </select>
+
+        <label for="evChargerType">Charger Type</label>
+        <select id="evChargerType">
+          <option>Fast Charger</option>
+          <option>Type 2</option>
+          <option>CCS</option>
+          <option>CHAdeMO</option>
+        </select>
+
+        <label for="evPrice">Price per kWh</label>
+        <input id="evPrice" type="number" min="0" step="1" placeholder="Example: 350">
+
+        <label for="evPorts">Available Charging Ports</label>
+        <input id="evPorts" type="number" min="0" step="1" placeholder="Example: 2">
+      </section>
+    `;
+
+    goHomeBtn.addEventListener("click", function () {
+      window.location.href = "index.html";
+    });
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const products = fuelProducts.reduce(function (acc, product) {
+        acc[product.key] = {
+          price: document.getElementById(product.key + "Price").value,
+          status: document.getElementById(product.key + "Status").value
+        };
+        return acc;
+      }, {});
+
+      const body = {
+        stationId: user.stationId,
+        products,
+        evCharging: {
+          enabled: document.getElementById("evEnabled").value === "true",
+          availability: document.getElementById("evAvailability").value,
+          chargerType: document.getElementById("evChargerType").value,
+          pricePerKwh: document.getElementById("evPrice").value,
+          availablePorts: document.getElementById("evPorts").value
+        },
+        price: products.pms.price,
+        fuelAvailable: products.pms.status === "Available" || products.pms.status === "Low Stock",
+        isOpen: toBoolean(document.getElementById("isOpen").value),
+        queueLevel: document.getElementById("queueLevel").value
+      };
+
+      statusMessage.textContent = "Submitting report...";
+
+      fetch("http://localhost:3000/reports", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify(body)
+      })
+      .then(function (res) {
+        if (res.status === 401) {
+          throw new Error("Session expired. Please login again.");
+        }
+        if (res.status === 403) {
+          throw new Error("Not allowed to report for this station.");
+        }
+        if (!res.ok) {
+          throw new Error("Failed to submit report.");
+        }
+        return res.json();
+      })
+      .then(function () {
+        statusMessage.textContent = "Report submitted successfully.";
+        form.reset();
+      })
+      .catch(function (err) {
+        console.error(err);
+        statusMessage.textContent = err.message || "Error submitting report.";
+      });
+    });
+  </script>
+</body>
+</html>

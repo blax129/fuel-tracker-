@@ -1,0 +1,356 @@
+{
+  "summary": {
+    "mode": "dry-run",
+    "threshold": 0.72,
+    "scanned": 38,
+    "highConfidence": 0,
+    "lowConfidence": 0,
+    "noResult": 0,
+    "errors": 38,
+    "updatesApplied": 0
+  },
+  "report": [
+    {
+      "stationId": "69f34449ae9895d743142614",
+      "name": "Enyo Service Station, Ikotun-Igando",
+      "brand": "ENYO",
+      "area": "Igando",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f461654f554c0998f01158",
+      "name": "Swift Oil Station",
+      "brand": "Swift Oil",
+      "area": "Igando-Egan",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f461654f554c0998f01159",
+      "name": "TotalEnergies - Igando Service Station",
+      "brand": "Total Energies",
+      "area": "Igando - Olowoila Bus Stop",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f461654f554c0998f0115a",
+      "name": "NNPC Filling Station",
+      "brand": "NNPC",
+      "area": "Igando-Egan",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f467954f554c0998f0115e",
+      "name": "DAHUSH OIL LTD",
+      "brand": "DAHUSH OIL",
+      "area": "Igando-Egan",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f467954f554c0998f0115f",
+      "name": "Fat-Noble Petroleum",
+      "brand": "Fat-Noble",
+      "area": "Igando-Akesan",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f467954f554c0998f01160",
+      "name": "Abanet Oil",
+      "brand": "Abanet Oil",
+      "area": "Igando-Isuti",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f467954f554c0998f01161",
+      "name": "M.O.J.",
+      "brand": "M.O.J.",
+      "area": "Igando-Lasu Road",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b81268b",
+      "name": "NNPC Igando Central",
+      "brand": "NNPC Retail",
+      "area": "Igando",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b81268c",
+      "name": "TotalEnergies Harmony Igando",
+      "brand": "TotalEnergies",
+      "area": "Igando",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b81268d",
+      "name": "Mobil Unity Igando",
+      "brand": "Mobil",
+      "area": "Igando",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b81268e",
+      "name": "Conoil Diamond Igando",
+      "brand": "Conoil",
+      "area": "Igando",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b81268f",
+      "name": "Oando Greenline Igando",
+      "brand": "Oando",
+      "area": "Igando",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b812690",
+      "name": "MRS Metro Igando",
+      "brand": "MRS",
+      "area": "Igando",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b812691",
+      "name": "NNPC Egan Bridge",
+      "brand": "NNPC Retail",
+      "area": "Egan",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b812692",
+      "name": "Rainoil Prime Egan",
+      "brand": "Rainoil",
+      "area": "Egan",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b812693",
+      "name": "Ardova Connect Egan",
+      "brand": "Ardova",
+      "area": "Egan",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b812694",
+      "name": "Enyo Swift Egan",
+      "brand": "Enyo",
+      "area": "Egan",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b812695",
+      "name": "Mobil Crest Egan",
+      "brand": "Mobil",
+      "area": "Egan",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b812696",
+      "name": "TotalEnergies Egan Court",
+      "brand": "TotalEnergies",
+      "area": "Egan",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b812697",
+      "name": "NNPC Ikotun Gate",
+      "brand": "NNPC Retail",
+      "area": "Ikotun",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b812698",
+      "name": "TotalEnergies Ikotun Plaza",
+      "brand": "TotalEnergies",
+      "area": "Ikotun",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b812699",
+      "name": "Conoil Ikotun Market",
+      "brand": "Conoil",
+      "area": "Ikotun",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b81269a",
+      "name": "Mobil Royal Ikotun",
+      "brand": "Mobil",
+      "area": "Ikotun",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b81269b",
+      "name": "Oando Ikotun Axis",
+      "brand": "Oando",
+      "area": "Ikotun",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b81269c",
+      "name": "MRS Ikotun Link",
+      "brand": "MRS",
+      "area": "Ikotun",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b81269d",
+      "name": "NNPC Idimu Junction",
+      "brand": "NNPC Retail",
+      "area": "Idimu",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b81269e",
+      "name": "TotalEnergies Idimu Estate",
+      "brand": "TotalEnergies",
+      "area": "Idimu",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b81269f",
+      "name": "Rainoil Idimu Prime",
+      "brand": "Rainoil",
+      "area": "Idimu",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b8126a0",
+      "name": "Conoil Idimu Court",
+      "brand": "Conoil",
+      "area": "Idimu",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b8126a1",
+      "name": "Ardova Idimu Central",
+      "brand": "Ardova",
+      "area": "Idimu",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b8126a2",
+      "name": "Mobil Idimu Heights",
+      "brand": "Mobil",
+      "area": "Idimu",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b8126a3",
+      "name": "NNPC Egbeda Main",
+      "brand": "NNPC Retail",
+      "area": "Egbeda",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b8126a4",
+      "name": "TotalEnergies Egbeda Crown",
+      "brand": "TotalEnergies",
+      "area": "Egbeda",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b8126a5",
+      "name": "Conoil Egbeda Avenue",
+      "brand": "Conoil",
+      "area": "Egbeda",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b8126a6",
+      "name": "Oando Egbeda Metro",
+      "brand": "Oando",
+      "area": "Egbeda",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b8126a7",
+      "name": "MRS Egbeda Link",
+      "brand": "MRS",
+      "area": "Egbeda",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    },
+    {
+      "stationId": "69f8827fafc72a629b8126a8",
+      "name": "Mobil Egbeda Point",
+      "brand": "Mobil",
+      "area": "Egbeda",
+      "confidence": 0,
+      "status": "error",
+      "error": "Google Maps API denied request: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started"
+    }
+  ]
+}

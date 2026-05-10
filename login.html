@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login / Sign Up - Fuel Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f4f6f7;
+      color: #172033;
+      font-family: Arial, sans-serif;
+    }
+
+    .auth-page {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .auth-card {
+      position: relative;
+      overflow: hidden;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 28px;
+      padding: 26px;
+      box-shadow: 0 22px 60px rgba(23, 32, 51, 0.12);
+    }
+
+    .country-btn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 44px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #d1d5db;
+      border-radius: 999px;
+      background: #ffffff;
+      cursor: pointer;
+      font-size: 18px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .country-btn:hover,
+    .country-btn:focus {
+      border-color: #0f766e;
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+      outline: none;
+    }
+
+    .brand {
+      margin: 6px 52px 22px 0;
+      text-align: center;
+    }
+
+    .logo {
+      width: 72px;
+      height: 72px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 12px;
+      border-radius: 22px;
+      background: #0f766e;
+      color: #ffffff;
+      font-size: 36px;
+      box-shadow: 0 16px 28px rgba(15, 118, 110, 0.22);
+    }
+
+    .brand h1 {
+      margin: 0;
+      color: #111827;
+      font-size: 25px;
+      letter-spacing: -0.03em;
+    }
+
+    .brand p {
+      margin: 5px 0 0;
+      color: #0f766e;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .mode-switch {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      padding: 5px;
+      margin-bottom: 22px;
+      border: 1px solid #e5e7eb;
+      border-radius: 999px;
+      background: #f9fafb;
+    }
+
+    .mode-switch button {
+      min-height: 38px;
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      color: #6b7280;
+      cursor: pointer;
+      font-weight: 800;
+      transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .mode-switch button.active {
+      background: #ffffff;
+      color: #172033;
+      box-shadow: 0 6px 16px rgba(23, 32, 51, 0.1);
+    }
+
+    .intro {
+      margin-bottom: 20px;
+      text-align: center;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .intro h2 {
+      margin: 0;
+      color: #111827;
+      font-size: 32px;
+      letter-spacing: -0.045em;
+    }
+
+    .intro p {
+      margin: 10px 0 0;
+      color: #4b5563;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .form-panel {
+      display: none;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+
+    .form-panel.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      top: 50%;
+      left: 13px;
+      color: #6b7280;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    input {
+      width: 100%;
+      min-height: 48px;
+      padding: 13px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 15px;
+      background: #f9fafb;
+      color: #111827;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, transform 0.2s ease;
+    }
+
+    .input-wrap input {
+      padding-left: 40px;
+    }
+
+    input:focus {
+      border-color: #0f766e;
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .password-wrap input {
+      padding-right: 48px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      cursor: pointer;
+      font-size: 16px;
+      transform: translateY(-50%);
+    }
+
+    .toggle-password:hover,
+    .toggle-password:focus {
+      background: #ecfdf5;
+      outline: none;
+    }
+
+    .location-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .location-btn {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid #ccfbf1;
+      border-radius: 13px;
+      background: #ecfdf5;
+      color: #0f766e;
+      cursor: pointer;
+      font-weight: 800;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .location-btn:hover,
+    .location-btn:focus {
+      background: #d1fae5;
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .terms {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 13px 0 16px;
+      color: #4b5563;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .terms input {
+      width: 18px;
+      min-height: 18px;
+      margin-top: 1px;
+      accent-color: #0f766e;
+      flex: 0 0 auto;
+    }
+
+    .terms a {
+      color: #0f766e;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .submit-btn {
+      width: 100%;
+      min-height: 50px;
+      border: none;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #ef3f23, #f97316);
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+      box-shadow: 0 14px 26px rgba(239, 63, 35, 0.22);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    .submit-btn:hover:not(:disabled),
+    .submit-btn:focus:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 34px rgba(239, 63, 35, 0.28);
+      outline: none;
+    }
+
+    .submit-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.52;
+      box-shadow: none;
+    }
+
+    .divider {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0 14px;
+      color: #9ca3af;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      height: 1px;
+      background: #e5e7eb;
+    }
+
+    .social-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .social-btn {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid #d1d5db;
+      border-radius: 14px;
+      background: #ffffff;
+      color: #172033;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .social-btn:hover,
+    .social-btn:focus {
+      background: #f9fafb;
+      border-color: #9ca3af;
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .bottom-text {
+      margin: 18px 0 0;
+      color: #4b5563;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .bottom-text button,
+    .home-link {
+      border: none;
+      background: transparent;
+      color: #0f766e;
+      cursor: pointer;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .home-link {
+      display: none;
+    }
+
+    .back-home-btn {
+      min-height: 38px;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      background: #ffffff;
+      color: #0f766e;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .back-home-corner {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      z-index: 2;
+    }
+
+    .back-home-btn:hover,
+    .back-home-btn:focus {
+      background: #ecfdf5;
+      border-color: #99f6e4;
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    #msg {
+      min-height: 20px;
+      margin: 14px 0 0;
+      color: #4b5563;
+      font-size: 13px;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    #msg.error {
+      color: #991b1b;
+    }
+
+    #msg.success {
+      color: #166534;
+    }
+
+    @media (min-width: 720px) {
+      .auth-page {
+        max-width: 480px;
+      }
+
+      .auth-card {
+        padding: 32px;
+      }
+
+      .location-row {
+        grid-template-columns: 1fr auto;
+      }
+
+      .location-btn {
+        width: auto;
+        padding: 0 14px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      body {
+        align-items: flex-start;
+        padding: 12px;
+      }
+
+      .auth-card {
+        border-radius: 22px;
+        padding: 22px;
+      }
+
+      .brand {
+        margin-right: 48px;
+      }
+
+      .intro h2 {
+        font-size: 29px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="auth-page">
+    <section class="auth-card" aria-labelledby="authTitle">
+      <a class="back-home-btn back-home-corner" href="home-header.html" aria-label="Back to homepage">← Back</a>
+      <button class="country-btn" type="button" aria-label="Nigeria">🇳🇬</button>
+
+      <header class="brand">
+        <div class="logo">⛽</div>
+        <h1>Fuel Tracker</h1>
+        <p>Live fuel updates across Nigeria</p>
+      </header>
+
+      <div class="mode-switch" role="tablist" aria-label="Authentication mode">
+        <button id="signupTab" class="active" type="button" onclick="setAuthMode('signup')" role="tab" aria-selected="true">Sign Up</button>
+        <button id="loginTab" type="button" onclick="setAuthMode('login')" role="tab" aria-selected="false">Log In</button>
+      </div>
+
+      <div class="intro">
+        <h2 id="authTitle">Get Started</h2>
+        <p id="authSubtitle">Find nearby fuel stations, compare que, fuel prices, and help drivers stay updated across Nigeria.</p>
+      </div>
+
+      <form id="signupForm" class="form-panel active" onsubmit="submitSignup(event)">
+        <div class="field">
+          <label for="signupIdentifier">Email or phone number</label>
+          <input id="signupIdentifier" type="text" placeholder="Email Address or Phone Number" autocomplete="email">
+        </div>
+
+        <div class="field">
+          <label for="signupPassword">Password</label>
+          <div class="input-wrap password-wrap">
+            <span class="input-icon">🔒</span>
+            <input id="signupPassword" type="password" placeholder="Create a password" autocomplete="new-password">
+            <button id="toggleSignupPassword" class="toggle-password" type="button" aria-label="Show password" onclick="togglePasswordVisibility('signupPassword', 'toggleSignupPassword')">👁</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="signupLocation">Area / Address</label>
+          <div class="location-row">
+            <div class="input-wrap">
+              <span class="input-icon">📍</span>
+              <input id="signupLocation" type="text" placeholder="Enter Area, Address, or Use Current Location" autocomplete="street-address">
+            </div>
+            <button class="location-btn" type="button" onclick="useCurrentLocation()">Use Current Location</button>
+          </div>
+        </div>
+
+        <label class="terms">
+          <input id="termsCheckbox" type="checkbox">
+          <span>I agree to the <a href="#" onclick="event.preventDefault()">Terms &amp; Conditions</a></span>
+        </label>
+
+        <button id="signupBtn" class="submit-btn" type="submit" disabled>SIGN UP</button>
+      </form>
+
+      <form id="loginForm" class="form-panel" onsubmit="submitLogin(event)">
+        <div class="field">
+          <label for="loginIdentifier">Email or phone number</label>
+          <input id="loginIdentifier" type="text" placeholder="Email Address or Phone Number" autocomplete="username">
+        </div>
+
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <div class="input-wrap password-wrap">
+            <span class="input-icon">🔒</span>
+            <input id="loginPassword" type="password" placeholder="Enter your password" autocomplete="current-password">
+            <button id="toggleLoginPassword" class="toggle-password" type="button" aria-label="Show password" onclick="togglePasswordVisibility('loginPassword', 'toggleLoginPassword')">👁</button>
+          </div>
+        </div>
+
+        <button id="loginBtn" class="submit-btn" type="submit" disabled>LOG IN</button>
+      </form>
+
+      <div class="divider">OR</div>
+      <div class="social-grid">
+        <button class="social-btn" type="button">Continue with Google</button>
+        <button class="social-btn" type="button">Continue with Facebook</button>
+      </div>
+
+      <p class="bottom-text" id="bottomText">
+        Already have an account? <button type="button" onclick="setAuthMode('login')">Log In</button>
+      </p>
+      <p id="msg"></p>
+    </section>
+  </main>
+
+  <script>
+    const lagosAreas = [
+      { area: "Ikeja", lat: 6.6018, lng: 3.3515 },
+      { area: "Yaba", lat: 6.5158, lng: 3.3792 },
+      { area: "Surulere", lat: 6.5012, lng: 3.3572 },
+      { area: "Lekki", lat: 6.4474, lng: 3.5037 },
+      { area: "Ajah", lat: 6.4698, lng: 3.5852 },
+      { area: "Gbagada", lat: 6.5582, lng: 3.3921 },
+      { area: "Maryland", lat: 6.572, lng: 3.3678 },
+      { area: "Ojodu", lat: 6.6423, lng: 3.3696 },
+      { area: "Ikorodu", lat: 6.6194, lng: 3.5105 },
+      { area: "Festac", lat: 6.4691, lng: 3.2869 },
+      { area: "Mushin", lat: 6.5355, lng: 3.3481 },
+      { area: "Agege", lat: 6.6256, lng: 3.3258 },
+      { area: "Alimosho", lat: 6.6042, lng: 3.2879 },
+      { area: "Oshodi", lat: 6.5578, lng: 3.3436 },
+      { area: "Berger", lat: 6.642, lng: 3.3739 }
+    ];
+
+    const state = {
+      mode: "signup",
+      location: null
+    };
+
+    const msg = document.getElementById("msg");
+    const signupForm = document.getElementById("signupForm");
+    const loginForm = document.getElementById("loginForm");
+    const signupBtn = document.getElementById("signupBtn");
+    const loginBtn = document.getElementById("loginBtn");
+
+    function setMessage(text, type = "") {
+      msg.className = type;
+      msg.innerText = text;
+    }
+
+    function setAuthMode(mode) {
+      state.mode = mode;
+      const isSignup = mode === "signup";
+
+      document.getElementById("signupTab").classList.toggle("active", isSignup);
+      document.getElementById("loginTab").classList.toggle("active", !isSignup);
+      document.getElementById("signupTab").setAttribute("aria-selected", String(isSignup));
+      document.getElementById("loginTab").setAttribute("aria-selected", String(!isSignup));
+      signupForm.classList.toggle("active", isSignup);
+      loginForm.classList.toggle("active", !isSignup);
+
+      document.getElementById("authTitle").innerText = isSignup ? "Get Started" : "Welcome back";
+      document.getElementById("authSubtitle").innerText = isSignup
+        ? "Find nearby fuel stations, compare que, fuel prices, and help drivers stay updated across Nigeria."
+        : "Log in to report prices, follow stations, and keep Lagos fuel updates fresh.";
+
+      document.getElementById("bottomText").innerHTML = isSignup
+        ? `Already have an account? <button type="button" onclick="setAuthMode('login')">Log In</button>`
+        : `New to Fuel Tracker? <button type="button" onclick="setAuthMode('signup')">Sign Up</button>`;
+
+      setMessage("");
+      validateForms();
+    }
+
+    function normalizePhone(value) {
+      const digits = value.replace(/\D/g, "");
+      if (digits.startsWith("234") && digits.length === 13) return "+" + digits;
+      if (digits.startsWith("0") && digits.length === 11) return "+234" + digits.slice(1);
+      return value.trim();
+    }
+
+    function isEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+    }
+
+    function isNigerianPhone(value) {
+      const normalized = normalizePhone(value);
+      return /^(\+234)(70|80|81|90|91)\d{8}$/.test(normalized);
+    }
+
+    function parseIdentifier(value) {
+      const trimmed = value.trim();
+      if (isEmail(trimmed)) return { email: trimmed.toLowerCase(), phone: null, identifier: trimmed.toLowerCase() };
+      if (isNigerianPhone(trimmed)) {
+        const phone = normalizePhone(trimmed);
+        return { email: null, phone, identifier: phone };
+      }
+      return null;
+    }
+
+    function getDistanceKm(a, b) {
+      const R = 6371;
+      const dLat = (b.lat - a.lat) * Math.PI / 180;
+      const dLng = (b.lng - a.lng) * Math.PI / 180;
+      const lat1 = a.lat * Math.PI / 180;
+      const lat2 = b.lat * Math.PI / 180;
+      const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+      return R * (2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h)));
+    }
+
+    function findNearestArea(lat, lng) {
+      const point = { lat, lng };
+      return lagosAreas
+        .map(item => ({ ...item, distance: getDistanceKm(point, item) }))
+        .sort((a, b) => a.distance - b.distance)[0];
+    }
+
+    function useCurrentLocation() {
+      const locationInput = document.getElementById("signupLocation");
+      if (!navigator.geolocation) {
+        setMessage("Location is not supported on this browser.", "error");
+        return;
+      }
+
+      setMessage("Getting your location...");
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const lat = Number(position.coords.latitude);
+          const lng = Number(position.coords.longitude);
+          const nearest = findNearestArea(lat, lng);
+
+          state.location = {
+            lat,
+            lng,
+            area: nearest ? nearest.area : null
+          };
+
+          locationInput.value = nearest
+            ? `Current location near ${nearest.area}, Lagos, Nigeria`
+            : `Current location (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+
+          setMessage("Location added.", "success");
+          validateForms();
+        },
+        () => {
+          setMessage("Location permission was not granted. You can enter your area or address manually.", "error");
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000
+        }
+      );
+    }
+
+    function validateForms() {
+      const signupIdentifier = parseIdentifier(document.getElementById("signupIdentifier").value);
+      const signupPassword = document.getElementById("signupPassword").value;
+      const signupLocation = document.getElementById("signupLocation").value.trim();
+      const termsChecked = document.getElementById("termsCheckbox").checked;
+
+      signupBtn.disabled = !(signupIdentifier && signupPassword.length >= 6 && signupLocation && termsChecked);
+
+      const loginIdentifier = parseIdentifier(document.getElementById("loginIdentifier").value);
+      const loginPassword = document.getElementById("loginPassword").value;
+      loginBtn.disabled = !(loginIdentifier && loginPassword);
+    }
+
+    function togglePasswordVisibility(inputId, buttonId) {
+      const passwordInput = document.getElementById(inputId);
+      const toggleButton = document.getElementById(buttonId);
+      const isHidden = passwordInput.type === "password";
+
+      passwordInput.type = isHidden ? "text" : "password";
+      toggleButton.innerText = isHidden ? "🙈" : "👁";
+      toggleButton.setAttribute("aria-label", isHidden ? "Hide password" : "Show password");
+    }
+
+    function setButtonLoading(button, isLoading, label) {
+      button.disabled = isLoading || button.disabled;
+      button.innerText = isLoading ? "PLEASE WAIT..." : label;
+      if (!isLoading) validateForms();
+    }
+
+    function submitSignup(event) {
+      event.preventDefault();
+      const identifier = parseIdentifier(document.getElementById("signupIdentifier").value);
+      const password = document.getElementById("signupPassword").value;
+      const address = document.getElementById("signupLocation").value.trim();
+
+      if (!identifier) {
+        setMessage("Enter a valid email address or Nigerian phone number.", "error");
+        return;
+      }
+
+      setMessage("Creating your account...");
+      setButtonLoading(signupBtn, true, "SIGN UP");
+
+      fetch("http://localhost:3000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: identifier.email,
+          phone: identifier.phone,
+          password,
+          area: state.location?.area || address,
+          address,
+          location: state.location ? { lat: state.location.lat, lng: state.location.lng } : null
+        })
+      })
+      .then(async res => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || "Sign up failed");
+        return data;
+      })
+      .then(() => {
+        setMessage("Account created. You can log in now.", "success");
+        setAuthMode("login");
+        document.getElementById("loginIdentifier").value = document.getElementById("signupIdentifier").value.trim();
+        validateForms();
+      })
+      .catch(err => {
+        setMessage(err.message === "Failed to fetch"
+          ? "Cannot reach the server. Make sure the backend is running on http://localhost:3000."
+          : err.message, "error");
+      })
+      .finally(() => {
+        setButtonLoading(signupBtn, false, "SIGN UP");
+      });
+    }
+
+    function submitLogin(event) {
+      event.preventDefault();
+      const identifier = parseIdentifier(document.getElementById("loginIdentifier").value);
+      const password = document.getElementById("loginPassword").value;
+
+      if (!identifier) {
+        setMessage("Enter a valid email address or Nigerian phone number.", "error");
+        return;
+      }
+
+      setMessage("Logging in...");
+      setButtonLoading(loginBtn, true, "LOG IN");
+
+      fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          identifier: identifier.identifier,
+          email: identifier.email,
+          phone: identifier.phone,
+          password
+        })
+      })
+      .then(async res => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || "Login failed");
+        return data;
+      })
+      .then(data => {
+        if (!data.token) throw new Error("Login failed. No token was returned.");
+        localStorage.setItem("token", data.token);
+        setMessage("Login successful.", "success");
+        window.location.href = "index.html";
+      })
+      .catch(err => {
+        setMessage(err.message === "Failed to fetch"
+          ? "Cannot reach the server. Make sure the backend is running on http://localhost:3000."
+          : err.message, "error");
+      })
+      .finally(() => {
+        setButtonLoading(loginBtn, false, "LOG IN");
+      });
+    }
+
+    ["signupIdentifier", "signupPassword", "signupLocation", "termsCheckbox", "loginIdentifier", "loginPassword"]
+      .forEach(id => document.getElementById(id).addEventListener("input", validateForms));
+
+    document.getElementById("termsCheckbox").addEventListener("change", validateForms);
+    const initialMode = new URLSearchParams(window.location.search).get("mode");
+    if (initialMode === "login" || initialMode === "signup") {
+      setAuthMode(initialMode);
+    }
+    validateForms();
+  </script>
+</body>
+</html>
