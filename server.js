@@ -275,6 +275,7 @@ async function geocodeAddressWithFallback(query) {
 
 async function connectDB() {
   try {
+    console.log("MongoDB connection attempt starting...");
     console.log(`Connecting to MongoDB database "${dbName}"...`);
     console.log(`MongoDB driver version: ${mongodbPackage.version}`);
     console.log(`MongoDB connection type: ${isAtlasConnection ? "Atlas/TLS" : "local/standard"}`);
@@ -282,8 +283,11 @@ async function connectDB() {
       console.log("MongoDB driver manages URL parsing and topology internally; legacy parser options are not used.");
     }
 
+    console.log("Opening MongoDB client connection...");
     await client.connect();
+    console.log("MongoDB client connected. Selecting database...");
     db = client.db(dbName);
+    console.log("Pinging MongoDB database...");
     await db.command({ ping: 1 });
     console.log(`Connected to MongoDB database "${dbName}"`);
   } catch (err) {
@@ -294,6 +298,8 @@ async function connectDB() {
       codeName: err.codeName,
       message: err.message
     });
+    console.error(err);
+    console.error(err.stack);
     throw err;
   }
 }
@@ -1064,16 +1070,36 @@ app.get("/api/location/ip", async (req, res) => {
 // ✅ START SERVER
 async function startServer() {
   try {
+    console.log("Server startup beginning...");
     await connectDB();
     const port = process.env.PORT || 3000;
+    console.log("Database connection ready. Starting Express listener...");
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);
     });
   } catch (err) {
     console.error("DB connection failed. Server was not started:", err);
+    console.error(err);
+    console.error(err.stack);
     process.exit(1);
   }
 }
+
+process.on("uncaughtException", error => {
+  console.error("Uncaught exception:");
+  console.error(error);
+  console.error(error.stack);
+  process.exit(1);
+});
+
+process.on("unhandledRejection", reason => {
+  console.error("Unhandled promise rejection:");
+  console.error(reason);
+  if (reason && reason.stack) {
+    console.error(reason.stack);
+  }
+  process.exit(1);
+});
 
 process.on("SIGINT", async () => {
   await client.close().catch(err => console.error("MongoDB close failed:", err));
