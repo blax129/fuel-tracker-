@@ -11,8 +11,11 @@ app.use(cors());
 app.use(express.json({ limit: "8mb" }));
 app.use(express.static(__dirname));
 
-const uri = "mongodb://127.0.0.1:27017";
-const client = new MongoClient(uri);
+const uri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017";
+const dbName = process.env.MONGODB_DB || "fuelTracker";
+const client = new MongoClient(uri, {
+  serverSelectionTimeoutMS: 10000
+});
 
 const SECRET = "super_secret_key_123";
 let db;
@@ -253,13 +256,39 @@ async function geocodeAddressWithFallback(query) {
 }
 
 async function connectDB() {
+  console.log(`Connecting to MongoDB database "${dbName}"...`);
   await client.connect();
-  db = client.db("fuelTracker");
-  console.log("Connected to MongoDB");
+  db = client.db(dbName);
+  await db.command({ ping: 1 });
+  console.log(`Connected to MongoDB database "${dbName}"`);
 }
 
-connectDB().catch(err => {
-  console.error("DB connection failed:", err);
+function requireDb(req, res, next) {
+  if (!db) {
+    console.error("MongoDB is not connected; rejecting request:", req.method, req.originalUrl);
+    return res.status(503).json({ message: "Database is not connected. Please try again shortly." });
+  }
+
+  next();
+}
+
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api/") || [
+    "/stations",
+    "/reports",
+    "/alerts",
+    "/register",
+    "/login",
+    "/partner/signup",
+    "/partner/login",
+    "/partner/me",
+    "/partner/station-profile",
+    "/partner/logout"
+  ].includes(req.path)) {
+    return requireDb(req, res, next);
+  }
+
+  next();
 });
 
 
@@ -998,6 +1027,27 @@ app.get("/api/location/ip", async (req, res) => {
 
 
 // ✅ START SERVER
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
+async function startServer() {
+  try {
+    await connectDB();
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
+    });
+  } catch (err) {
+    console.error("DB connection failed. Server was not started:", err);
+    process.exit(1);
+  }
+}
+
+process.on("SIGINT", async () => {
+  await client.close().catch(err => console.error("MongoDB close failed:", err));
+  process.exit(0);
 });
+
+process.on("SIGTERM", async () => {
+  await client.close().catch(err => console.error("MongoDB close failed:", err));
+  process.exit(0);
+});
+
+startServer();
