@@ -727,7 +727,7 @@
       setMessage("Creating your account...");
       setButtonLoading(signupBtn, true, "SIGN UP");
 
-      fetch("http://localhost:3000/register", {
+      fetch("https://fuel-tracker-w4ym.onrender.com/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -754,7 +754,7 @@
       })
       .catch(err => {
         setMessage(err.message === "Failed to fetch"
-          ? "Cannot reach the server. Make sure the backend is running on http://localhost:3000."
+          ? "Cannot reach the production server. Please try again shortly."
           : err.message, "error");
       })
       .finally(() => {
@@ -775,7 +775,7 @@
       setMessage("Logging in...");
       setButtonLoading(loginBtn, true, "LOG IN");
 
-      fetch("http://localhost:3000/login", {
+      fetch("https://fuel-tracker-w4ym.onrender.com/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -800,7 +800,7 @@
       })
       .catch(err => {
         setMessage(err.message === "Failed to fetch"
-          ? "Cannot reach the server. Make sure the backend is running on http://localhost:3000."
+          ? "Cannot reach the production server. Please try again shortly."
           : err.message, "error");
       })
       .finally(() => {

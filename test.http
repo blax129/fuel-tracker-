@@ -1,5 +1,5 @@
 ### REGISTER
-POST http://localhost:3000/register
+POST https://fuel-tracker-w4ym.onrender.com/register
 Content-Type: application/json
 
 {
@@ -11,7 +11,7 @@ Content-Type: application/json
 
 ###
 ### LOGIN
-POST http://localhost:3000/login
+POST https://fuel-tracker-w4ym.onrender.com/login
 Content-Type: application/json
 
 {
@@ -21,7 +21,7 @@ Content-Type: application/json
 
 ###
 ### POST REPORT
-POST http://localhost:3000/reports
+POST https://fuel-tracker-w4ym.onrender.com/reports
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWY0ZTI5OGEzYTE3MzNiY2M2MzExYTQiLCJyb2xlIjoidXNlciIsInN0YXRpb25JZCI6bnVsbCwiaWF0IjoxNzc3NjY0MzE3LCJleHAiOjE3NzgyNjkxMTd9.3q4Yg7ZCVDmg1Ud9Bs6tM-Y1fvGpIif17EqswpQYZw4
 

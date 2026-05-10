@@ -1570,7 +1570,7 @@ function requestUserLocation() {
 
 function attemptApproximateLocationFallback({ denied, timeout, locationBtn, previousLocationText }) {
   setSearchMeta("Using approximate network location...", true);
-  fetch("http://localhost:3000/api/location/ip")
+  fetch("https://fuel-tracker-w4ym.onrender.com/api/location/ip")
     .then(res => res.ok ? res.json() : Promise.reject(new Error(`IP location failed: ${res.status}`)))
     .then(payload => {
       const result = payload?.result || {};
@@ -2979,7 +2979,7 @@ function applyStationFilters(options = {}) {
 function loadStations(options = {}) {
   stationLoadPending = true;
   if (resultCount) resultCount.textContent = "Loading...";
-  fetch("http://localhost:3000/stations")
+  fetch("https://fuel-tracker-w4ym.onrender.com/stations")
     .then(res => res.json())
     .then(data => {
       allStations = Array.isArray(data) ? data : [];
@@ -3008,7 +3008,7 @@ function requestAutocomplete(inputValue) {
   autocompletePending = true;
   setSearchMeta("Loading address suggestions...", true);
 
-  fetch(`http://localhost:3000/api/location/autocomplete?q=${encodeURIComponent(text)}`)
+  fetch(`https://fuel-tracker-w4ym.onrender.com/api/location/autocomplete?q=${encodeURIComponent(text)}`)
     .then(res => res.ok ? res.json() : Promise.reject(new Error(`Autocomplete failed: ${res.status}`)))
     .then(payload => {
       if (requestId !== autocompleteRequestState.requestId) return;
@@ -3035,7 +3035,7 @@ function requestAddressGeocode(inputValue) {
   const requestId = geocodeRequestState.requestId;
   setSearchMeta("Resolving address coordinates...", true);
 
-  fetch(`http://localhost:3000/api/location/geocode?q=${encodeURIComponent(text)}`)
+  fetch(`https://fuel-tracker-w4ym.onrender.com/api/location/geocode?q=${encodeURIComponent(text)}`)
     .then(res => res.ok ? res.json() : Promise.reject(new Error(`Geocode failed: ${res.status}`)))
     .then(payload => {
       if (requestId !== geocodeRequestState.requestId) return;
@@ -3096,7 +3096,7 @@ function submitReport(stationId) {
 
   container.innerHTML = "Loading stations...";
   
-  fetch("http://localhost:3000/reports", {
+  fetch("https://fuel-tracker-w4ym.onrender.com/reports", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -3126,7 +3126,7 @@ function submitReport(stationId) {
 }
 
 function loadAlerts() {
-  fetch("http://localhost:3000/alerts")
+  fetch("https://fuel-tracker-w4ym.onrender.com/alerts")
     .then(res => res.json())
     .then(data => {
       const alertBox = document.getElementById("alerts");
