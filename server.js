@@ -1,6 +1,6 @@
 const express = require("express");
 const path = require("path");
-const { MongoClient, ObjectId } = require("mongodb");
+const { MongoClient, ObjectId, ServerApiVersion } = require("mongodb");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -14,20 +14,19 @@ app.use(express.static(__dirname));
 
 const uri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017";
 const dbName = process.env.MONGODB_DB || "fuelTracker";
-const mongodbDriverMajor = Number(String(mongodbPackage.version).split(".")[0]);
 const isAtlasConnection = uri.startsWith("mongodb+srv://") || uri.includes(".mongodb.net");
 const mongoClientOptions = {
   serverSelectionTimeoutMS: 30000,
   connectTimeoutMS: 30000,
   socketTimeoutMS: 45000,
   maxPoolSize: 10,
-  appName: "fuel-tracker"
+  appName: "fuel-tracker",
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: false,
+    deprecationErrors: true
+  }
 };
-
-if (mongodbDriverMajor < 4) {
-  mongoClientOptions.useNewUrlParser = true;
-  mongoClientOptions.useUnifiedTopology = true;
-}
 
 if (isAtlasConnection) {
   mongoClientOptions.tls = true;
@@ -279,9 +278,8 @@ async function connectDB() {
     console.log(`Connecting to MongoDB database "${dbName}"...`);
     console.log(`MongoDB driver version: ${mongodbPackage.version}`);
     console.log(`MongoDB connection type: ${isAtlasConnection ? "Atlas/TLS" : "local/standard"}`);
-    if (mongodbDriverMajor >= 4) {
-      console.log("MongoDB driver manages URL parsing and topology internally; legacy parser options are not used.");
-    }
+    console.log(`MongoDB Server API version: ${ServerApiVersion.v1}`);
+    console.log(`MongoDB TLS enabled: ${Boolean(mongoClientOptions.tls)}`);
 
     console.log("Opening MongoDB client connection...");
     await client.connect();
