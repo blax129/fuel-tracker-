@@ -9,7 +9,9 @@
     "geocode:stations": "node scripts/geocode-stations.js --provider google --dry-run",
     "geocode:stations:apply": "node scripts/geocode-stations.js --provider google --apply --threshold 0.68 --delay-ms 1100",
     "geocode:stations:retry-failed": "node scripts/geocode-stations.js --provider google --dry-run --failed-report geocode-dry-run.json",
-    "geocode:stations:retry-failed:apply": "node scripts/geocode-stations.js --provider google --apply --threshold 0.68 --delay-ms 1100 --failed-report geocode-dry-run.json"
+    "geocode:stations:retry-failed:apply": "node scripts/geocode-stations.js --provider google --apply --threshold 0.68 --delay-ms 1100 --failed-report geocode-dry-run.json",
+    "coordinates:refine": "node scripts/refine-station-coordinates.js --dry-run",
+    "coordinates:refine:apply": "node scripts/refine-station-coordinates.js --apply"
   },
   "keywords": [],
   "author": "",
