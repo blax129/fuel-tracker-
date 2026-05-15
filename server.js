@@ -56,6 +56,9 @@ const FUEL_PRODUCTS = [
 
 const VALID_AVAILABILITY_STATUSES = new Set(["Available", "Low Stock", "Out of Stock"]);
 const VALID_EV_AVAILABILITY_STATUSES = new Set(["Available", "Limited", "Unavailable", "Out of Service"]);
+const VALID_QUEUE_LEVELS = new Set(["short", "medium", "long"]);
+const VALID_REPORT_SOURCE_TYPES = new Set(["owner", "user", "system"]);
+const OWNER_ACCOUNT_STATUSES = new Set(["pending", "approved", "rejected", "suspended"]);
 
 function legacyAvailabilityToStatus(value) {
   if (value === true) return "Available";
@@ -144,6 +147,195 @@ function normalizeStationProducts(station) {
 
 function getPmsFromProducts(products = {}) {
   return normalizeProductEntry(products.pms);
+}
+
+function getAgoFromProducts(products = {}) {
+  return normalizeProductEntry(products.ago);
+}
+
+function booleanOrNull(value) {
+  if (value === true || value === "true") return true;
+  if (value === false || value === "false") return false;
+  return null;
+}
+
+function objectIdOrNull(value) {
+  if (!value) return null;
+  if (value instanceof ObjectId) return value;
+  return ObjectId.isValid(value) ? new ObjectId(value) : null;
+}
+
+function normalizeOwnerStatus(value, fallback = "pending") {
+  const normalized = String(value || "").trim().toLowerCase();
+  const statusMap = {
+    "pending verification": "pending",
+    approved: "approved",
+    pending: "pending",
+    rejected: "rejected",
+    suspended: "suspended"
+  };
+  const status = statusMap[normalized] || fallback;
+  return OWNER_ACCOUNT_STATUSES.has(status) ? status : fallback;
+}
+
+function getOwnerStatus(user = {}) {
+  if (user.role === "station" && !user.status && !user.accountStatus) {
+    return "approved";
+  }
+
+  return normalizeOwnerStatus(user.status || user.accountStatus);
+}
+
+async function getCurrentUserFromToken(req) {
+  const userId = objectIdOrNull(req.user?.userId);
+  if (!userId) return null;
+  return db.collection("users").findOne({ _id: userId });
+}
+
+async function requireApprovedOwnerAccount(req, res) {
+  const currentUser = await getCurrentUserFromToken(req);
+
+  if (!currentUser || !["station", "station_owner"].includes(currentUser.role)) {
+    res.status(403).json({ message: "Station owner account required" });
+    return null;
+  }
+
+  const status = getOwnerStatus(currentUser);
+  if (status !== "approved") {
+    res.status(403).json({ message: "Station account is not approved" });
+    return null;
+  }
+
+  return currentUser;
+}
+
+async function requireAdminAccount(req, res) {
+  const currentUser = await getCurrentUserFromToken(req);
+  if (!currentUser || currentUser.role !== "admin") {
+    res.status(403).json({ message: "Admin account required" });
+    return null;
+  }
+
+  return currentUser;
+}
+
+function withProductShortcuts(products = {}, body = {}) {
+  const mergedProducts = { ...(products || {}) };
+  const petrolPrice = body.petrolPrice ?? body.price;
+  const dieselPrice = body.dieselPrice;
+
+  if (petrolPrice !== undefined || body.fuelAvailable !== undefined) {
+    mergedProducts.pms = {
+      ...(mergedProducts.pms || {}),
+      price: petrolPrice ?? mergedProducts.pms?.price,
+      status: mergedProducts.pms?.status || (
+        body.fuelAvailable === undefined
+          ? undefined
+          : (booleanOrNull(body.fuelAvailable) ? "Available" : "Out of Stock")
+      )
+    };
+  }
+
+  if (dieselPrice !== undefined) {
+    mergedProducts.ago = {
+      ...(mergedProducts.ago || {}),
+      price: dieselPrice
+    };
+  }
+
+  return mergedProducts;
+}
+
+async function saveFuelReport({ stationId, body, user, sourceType }) {
+  if (!VALID_REPORT_SOURCE_TYPES.has(sourceType)) {
+    const error = new Error("Invalid report source type");
+    error.status = 400;
+    throw error;
+  }
+
+  const stationObjectId = objectIdOrNull(stationId);
+  if (!stationObjectId) {
+    const error = new Error("Valid stationId is required");
+    error.status = 400;
+    throw error;
+  }
+
+  const station = await db.collection("stations").findOne({ _id: stationObjectId });
+  if (!station) {
+    const error = new Error("Station not found");
+    error.status = 404;
+    throw error;
+  }
+
+  const previousLatestReport = await db.collection("reports").findOne(
+    { stationId: stationObjectId },
+    { sort: { createdAt: -1, _id: -1 } }
+  );
+
+  const now = new Date();
+  const reportProducts = withProductShortcuts(body.products, body);
+  const normalizedProducts = normalizeProducts(reportProducts, {
+    pms: {
+      price: body.petrolPrice ?? body.price,
+      fuelAvailable: body.fuelAvailable,
+      lastUpdated: now
+    },
+    ago: {
+      price: body.dieselPrice,
+      lastUpdated: now
+    }
+  });
+  const pmsProduct = getPmsFromProducts(normalizedProducts);
+  const agoProduct = getAgoFromProducts(normalizedProducts);
+  const normalizedEvCharging = normalizeEvCharging(body.evCharging, {
+    lastUpdated: now
+  });
+  const queueLevel = VALID_QUEUE_LEVELS.has(body.queueLevel) ? body.queueLevel : null;
+  const submittedById = objectIdOrNull(user?.userId || user?._id);
+
+  const newReport = {
+    stationId: stationObjectId,
+    sourceType,
+    source: sourceType,
+    submittedBy: {
+      userId: submittedById,
+      role: user?.role || sourceType
+    },
+    userId: submittedById,
+    products: normalizedProducts,
+    evCharging: normalizedEvCharging,
+    petrolPrice: pmsProduct.price,
+    dieselPrice: agoProduct.price,
+    price: pmsProduct.price,
+    fuelAvailable: pmsProduct.status === "Available" || pmsProduct.status === "Low Stock",
+    isOpen: booleanOrNull(body.isOpen),
+    queueLevel,
+    createdAt: now
+  };
+
+  await db.collection("reports").insertOne(newReport);
+
+  const previousProducts = normalizeProducts(previousLatestReport?.products, {
+    pms: {
+      price: previousLatestReport?.petrolPrice ?? previousLatestReport?.price,
+      fuelAvailable: previousLatestReport?.fuelAvailable,
+      lastUpdated: previousLatestReport?.createdAt
+    }
+  });
+  const shouldCreateFuelAlert =
+    previousLatestReport &&
+    previousProducts.pms.status === "Out of Stock" &&
+    normalizedProducts.pms.status !== "Out of Stock";
+
+  if (shouldCreateFuelAlert) {
+    await db.collection("alerts").insertOne({
+      stationId: stationObjectId,
+      message: "Fuel available now",
+      createdAt: now
+    });
+  }
+
+  return newReport;
 }
 
 function clampConfidence(value) {
@@ -287,6 +479,7 @@ async function connectDB() {
     db = client.db(dbName);
     console.log("Pinging MongoDB database...");
     await db.command({ ping: 1 });
+    await db.collection("reports").createIndex({ stationId: 1, createdAt: -1 });
     console.log(`Connected to MongoDB database "${dbName}"`);
   } catch (err) {
     db = null;
@@ -400,6 +593,11 @@ function partnerDashboardGuard(req, res, next) {
 // ✅ GET STATIONS
 app.get("/stations", async (req, res) => {
   try {
+    console.log("PUBLIC STATIONS DEBUG: request received", {
+      path: req.originalUrl,
+      hasAuthorizationHeader: Boolean(req.headers.authorization)
+    });
+
     const data = await db.collection("stations").aggregate([
       {
         $lookup: {
@@ -440,9 +638,12 @@ app.get("/stations", async (req, res) => {
       }
     ]).toArray();
 
-    res.json(data.map(normalizeStationProducts));
+    const stations = data.map(normalizeStationProducts);
+    console.log("PUBLIC STATIONS DEBUG: returning station count", stations.length);
+    res.set("Cache-Control", "no-store");
+    res.json(stations);
   } catch (err) {
-    console.error(err);
+    console.error("PUBLIC STATIONS DEBUG: station fetch failed", err);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -451,92 +652,163 @@ app.get("/stations", async (req, res) => {
 // ✅ POST REPORT (PROTECTED 🔒)
 app.post("/reports", authMiddleware, async (req, res) => {
   try {
-    const { stationId, price, fuelAvailable, isOpen, queueLevel, products, evCharging } = req.body;
+    const isOwnerAccount = ["station", "station_owner"].includes(req.user.role);
+    let effectiveStationId = req.body.stationId;
+    let currentUser = null;
 
-    let effectiveStationId = stationId;
-
-    if (req.user.role === "station" || req.user.role === "station_owner") {
-      if (req.user.role === "station_owner" && req.user.accountStatus !== "Approved") {
-        return res.status(403).json({ message: "Station account is awaiting approval" });
-      }
-
-      effectiveStationId = req.user.stationId;
-      if (!effectiveStationId) {
-        return res.status(400).json({ message: "stationId is required for station accounts" });
-      }
-    } else if (!effectiveStationId) {
-      return res.status(400).json({ message: "stationId is required" });
+    if (isOwnerAccount) {
+      currentUser = await requireApprovedOwnerAccount(req, res);
+      if (!currentUser) return;
+      effectiveStationId = currentUser.stationId;
     }
 
-    const stationObjectId = new ObjectId(effectiveStationId);
-    const previousLatestReport = await db.collection("reports").findOne(
-      { stationId: stationObjectId },
-      { sort: { createdAt: -1, _id: -1 } }
-    );
-
-    const normalizedProducts = normalizeProducts(products, {
-      pms: {
-        price,
-        fuelAvailable,
-        lastUpdated: new Date()
-      }
-    });
-    const pmsProduct = getPmsFromProducts(normalizedProducts);
-    const normalizedEvCharging = normalizeEvCharging(evCharging, {
-      lastUpdated: new Date()
-    });
-
-    const newReport = {
-      stationId: stationObjectId,
-      products: normalizedProducts,
-      evCharging: normalizedEvCharging,
-      price: pmsProduct.price,
-      fuelAvailable: pmsProduct.status === "Available" || pmsProduct.status === "Low Stock",
-      isOpen,
-      queueLevel: queueLevel || null,
-      source: "user",
-      createdAt: new Date(),
-      userId: new ObjectId(req.user.userId)
-    };
-
-    await db.collection("reports").insertOne(newReport);
-    await db.collection("stations").updateOne(
-      { _id: stationObjectId },
-      {
-        $set: {
-          products: normalizedProducts,
-          evCharging: normalizedEvCharging,
-          fuelAvailable: newReport.fuelAvailable,
-          price: pmsProduct.price,
-          lastUpdated: newReport.createdAt
-        }
-      }
-    );
-
-    const previousProducts = normalizeProducts(previousLatestReport?.products, {
-      pms: {
-        price: previousLatestReport?.price,
-        fuelAvailable: previousLatestReport?.fuelAvailable,
-        lastUpdated: previousLatestReport?.createdAt
-      }
-    });
-    const shouldCreateFuelAlert =
-      previousLatestReport &&
-      previousProducts.pms.status === "Out of Stock" &&
-      normalizedProducts.pms.status !== "Out of Stock";
-
-    if (shouldCreateFuelAlert) {
-      await db.collection("alerts").insertOne({
-        stationId: stationObjectId,
-        message: "Fuel available now",
-        createdAt: new Date()
-      });
+    if (isOwnerAccount && !effectiveStationId) {
+      return res.status(400).json({ message: "stationId is required for station accounts" });
     }
 
-    res.json({ message: "Report saved successfully" });
+    const report = await saveFuelReport({
+      stationId: effectiveStationId,
+      body: req.body,
+      user: currentUser || req.user,
+      sourceType: isOwnerAccount ? "owner" : "user"
+    });
+
+    res.json({ message: "Report saved successfully", reportId: report._id });
 
   } catch (err) {
     console.error("❌ REPORT ERROR:", err);
+    res.status(err.status || 500).json({ message: err.status ? err.message : "Server error" });
+  }
+});
+
+// ✅ OFFICIAL OWNER UPDATE (PROTECTED 🔒)
+app.post("/api/owner/reports", authMiddleware, async (req, res) => {
+  try {
+    const currentUser = await requireApprovedOwnerAccount(req, res);
+    if (!currentUser) return;
+
+    if (!currentUser.stationId) {
+      return res.status(400).json({ message: "No station is linked to this owner account" });
+    }
+
+    const report = await saveFuelReport({
+      stationId: currentUser.stationId,
+      body: req.body,
+      user: currentUser,
+      sourceType: "owner"
+    });
+
+    res.json({ message: "Official station update saved", reportId: report._id });
+  } catch (err) {
+    console.error("❌ OWNER REPORT ERROR:", err);
+    res.status(err.status || 500).json({ message: err.status ? err.message : "Server error" });
+  }
+});
+
+function publicOwnerForAdmin(user = {}) {
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    status: getOwnerStatus(user),
+    accountStatus: getOwnerStatus(user),
+    stationName: user.stationDraft?.name || null,
+    stationAddress: user.stationDraft?.address || user.address || null,
+    fuelBrand: user.stationDraft?.brand || null,
+    stationId: user.stationId || null,
+    createdAt: user.createdAt || null
+  };
+}
+
+async function updateOwnerStatus(req, res, status) {
+  const admin = await requireAdminAccount(req, res);
+  if (!admin) return null;
+
+  const ownerId = objectIdOrNull(req.params.id);
+  if (!ownerId) {
+    res.status(400).json({ message: "Valid owner id is required" });
+    return null;
+  }
+
+  const result = await db.collection("users").findOneAndUpdate(
+    {
+      _id: ownerId,
+      role: { $in: ["station_owner", "station"] }
+    },
+    {
+      $set: {
+        status,
+        accountStatus: status,
+        reviewedAt: new Date(),
+        reviewedBy: admin._id
+      }
+    },
+    { returnDocument: "after", projection: { password: 0 } }
+  );
+
+  if (!result) {
+    res.status(404).json({ message: "Owner account not found" });
+    return null;
+  }
+
+  return result;
+}
+
+// ✅ ADMIN OWNER APPROVAL ROUTES (PROTECTED 🔒)
+app.get("/api/admin/pending-owners", authMiddleware, async (req, res) => {
+  try {
+    const admin = await requireAdminAccount(req, res);
+    if (!admin) return;
+
+    const owners = await db.collection("users").find({
+      role: { $in: ["station_owner", "station"] },
+      $or: [
+        { status: "pending" },
+        { accountStatus: "pending" },
+        { accountStatus: "Pending Verification" }
+      ]
+    }, {
+      projection: { password: 0 },
+      sort: { createdAt: -1 }
+    }).toArray();
+
+    res.json(owners.map(publicOwnerForAdmin));
+  } catch (err) {
+    console.error("ADMIN PENDING OWNERS ERROR:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.post("/api/admin/approve-owner/:id", authMiddleware, async (req, res) => {
+  try {
+    const owner = await updateOwnerStatus(req, res, "approved");
+    if (!owner) return;
+    res.json({ message: "Owner approved", owner: publicOwnerForAdmin(owner) });
+  } catch (err) {
+    console.error("ADMIN APPROVE OWNER ERROR:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.post("/api/admin/reject-owner/:id", authMiddleware, async (req, res) => {
+  try {
+    const owner = await updateOwnerStatus(req, res, "rejected");
+    if (!owner) return;
+    res.json({ message: "Owner rejected", owner: publicOwnerForAdmin(owner) });
+  } catch (err) {
+    console.error("ADMIN REJECT OWNER ERROR:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.post("/api/admin/suspend-owner/:id", authMiddleware, async (req, res) => {
+  try {
+    const owner = await updateOwnerStatus(req, res, "suspended");
+    if (!owner) return;
+    res.json({ message: "Owner suspended", owner: publicOwnerForAdmin(owner) });
+  } catch (err) {
+    console.error("ADMIN SUSPEND OWNER ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -588,6 +860,12 @@ app.post("/register", async (req, res) => {
     const assignedRole = role || "user";
     const normalizedEmail = email ? email.trim().toLowerCase() : null;
     const normalizedPhone = phone ? phone.trim() : null;
+
+    if (!["station", "station_owner"].includes(assignedRole)) {
+      return res.status(410).json({
+        message: "Public accounts are no longer required. Station owners should use /partner/signup."
+      });
+    }
 
     if ((!normalizedEmail && !normalizedPhone) || !password) {
       return res.status(400).json({ message: "Email or phone, and password are required" });
@@ -657,11 +935,18 @@ app.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid email, phone, or password" });
     }
 
+    if (!["station", "station_owner", "admin"].includes(user.role)) {
+      return res.status(403).json({
+        message: "Public login has been retired. Station owners should use /partner/login."
+      });
+    }
+
     const token = jwt.sign(
   {
     userId: user._id,
     role: user.role,
-    stationId: user.stationId
+    stationId: user.stationId,
+    status: user.role === "admin" ? "approved" : getOwnerStatus(user)
   },
   SECRET,
   { expiresIn: "7d" }
@@ -674,7 +959,8 @@ res.json({
     name: user.name,
     email: user.email,
     role: user.role,
-    stationId: user.stationId
+    stationId: user.stationId,
+    status: user.role === "admin" ? "approved" : getOwnerStatus(user)
   }
 });
 
@@ -738,7 +1024,8 @@ app.post("/partner/signup", async (req, res) => {
       phone: normalizedPhone,
       password: hashedPassword,
       role: "station_owner",
-      accountStatus: "Pending Verification",
+      status: "pending",
+      accountStatus: "pending",
       stationId: claimedStationId,
       stationDraft: {
         name: stationName,
@@ -757,7 +1044,8 @@ app.post("/partner/signup", async (req, res) => {
 
     res.json({
       message: "Your station account is awaiting approval.",
-      accountStatus: "Pending Verification"
+      status: "pending",
+      accountStatus: "pending"
     });
   } catch (err) {
     console.error("PARTNER SIGNUP ERROR:", err);
@@ -797,7 +1085,8 @@ app.post("/partner/login", async (req, res) => {
         userId: user._id,
         role: user.role,
         stationId: user.stationId,
-        accountStatus: user.accountStatus || "Approved"
+        status: getOwnerStatus(user),
+        accountStatus: getOwnerStatus(user)
       },
       SECRET,
       { expiresIn: "7d" }
@@ -818,7 +1107,8 @@ app.post("/partner/login", async (req, res) => {
         phone: user.phone,
         role: user.role,
         stationId: user.stationId,
-        accountStatus: user.accountStatus || "Approved",
+        status: getOwnerStatus(user),
+        accountStatus: getOwnerStatus(user),
         stationDraft: user.stationDraft || null,
         partnerProfile: user.partnerProfile || {}
       }
@@ -862,7 +1152,8 @@ app.get("/partner/me", authMiddleware, async (req, res) => {
     res.json({
       user: {
         ...user,
-        accountStatus: user.accountStatus || "Approved",
+        status: getOwnerStatus(user),
+        accountStatus: getOwnerStatus(user),
         station
       }
     });
@@ -891,7 +1182,8 @@ app.post("/partner/station-profile", authMiddleware, async (req, res) => {
       { $set: { partnerProfile } }
     );
 
-    if (req.user.stationId && req.user.accountStatus === "Approved") {
+    const currentUser = await getCurrentUserFromToken(req);
+    if (req.user.stationId && getOwnerStatus(currentUser || req.user) === "approved") {
       await db.collection("stations").updateOne(
         { _id: new ObjectId(req.user.stationId) },
         { $set: { operatingHours: partnerProfile.operatingHours, photos: partnerProfile.photos } }

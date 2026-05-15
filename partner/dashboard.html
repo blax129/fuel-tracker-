@@ -368,15 +368,15 @@
 
     function applyUser(user) {
       currentUser = user;
-      const status = user.accountStatus || "Approved";
+      const status = (user.status || user.accountStatus || "pending").toLowerCase();
       const station = user.stationDraft || {};
       document.getElementById("stationTitle").textContent = station.name || "Manage Your Station";
       document.getElementById("stationSubtitle").textContent = station.address || "Update prices, stock status, operating hours, and station photos.";
       accountStatus.textContent = status;
-      accountStatus.classList.toggle("approved", status === "Approved");
-      pendingNotice.classList.toggle("is-visible", status !== "Approved");
-      fuelSubmitBtn.disabled = status !== "Approved";
-      if (status !== "Approved") {
+      accountStatus.classList.toggle("approved", status === "approved");
+      pendingNotice.classList.toggle("is-visible", status !== "approved");
+      fuelSubmitBtn.disabled = status !== "approved";
+      if (status !== "approved") {
         setMessage(fuelMessage, "Fuel publishing unlocks after account approval.", "error");
       }
       document.getElementById("operatingHours").value = user.partnerProfile?.operatingHours || "";
@@ -391,7 +391,7 @@
 
     renderFuelCards();
 
-    fetch("https://fuel-tracker-w4ym.onrender.com/partner/me", {
+    fetch("http://localhost:3000/partner/me", {
       headers: { "Authorization": "Bearer " + token }
     })
     .then(async res => {
@@ -424,7 +424,8 @@
 
     fuelForm.addEventListener("submit", event => {
       event.preventDefault();
-      if (!currentUser || currentUser.accountStatus !== "Approved") {
+      const status = (currentUser?.status || currentUser?.accountStatus || "pending").toLowerCase();
+      if (!currentUser || status !== "approved") {
         setMessage(fuelMessage, "Your station account is awaiting approval.", "error");
         return;
       }
@@ -445,7 +446,7 @@
       };
 
       setMessage(fuelMessage, "Publishing fuel update...");
-      fetch("https://fuel-tracker-w4ym.onrender.com/reports", {
+      fetch("http://localhost:3000/reports", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -473,7 +474,7 @@
     profileForm.addEventListener("submit", event => {
       event.preventDefault();
       setMessage(profileMessage, "Saving station profile...");
-      fetch("https://fuel-tracker-w4ym.onrender.com/partner/station-profile", {
+      fetch("http://localhost:3000/partner/station-profile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -495,7 +496,7 @@
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
       localStorage.removeItem("partnerToken");
-      fetch("https://fuel-tracker-w4ym.onrender.com/partner/logout", { method: "POST" })
+      fetch("http://localhost:3000/partner/logout", { method: "POST" })
         .finally(() => {
           window.location.href = "/partner/login";
         });

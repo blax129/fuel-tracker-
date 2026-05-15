@@ -174,24 +174,6 @@
       outline: none;
     }
 
-    .auth-actions button {
-      min-height: 38px;
-      margin: 0;
-      padding: 0 12px;
-      border-radius: 10px;
-      font-size: 14px;
-    }
-
-    .signup-link {
-      background: #0f766e;
-      color: #ffffff;
-    }
-
-    .signup-link:hover,
-    .signup-link:focus {
-      background: #115e59;
-    }
-
     .mobile-menu {
       position: fixed;
       inset: 64px 0 0;
@@ -203,6 +185,10 @@
     }
 
     body.menu-open {
+      overflow: hidden;
+    }
+
+    body.station-list-open {
       overflow: hidden;
     }
 
@@ -307,14 +293,6 @@
       color: #0f766e;
     }
 
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
-
-
     .location-btn {
       min-height: 48px;
       margin: 0;
@@ -333,12 +311,6 @@
       background: #f59e0b;
       color: #172033;
       outline: none;
-    }
-
-    .hero-note {
-      color: #64748b;
-      font-size: 13px;
-      font-weight: 700;
     }
 
     .header {
@@ -761,14 +733,6 @@
       margin-right: 8px;
     }
 
-    .auth-required-btn {
-      background: #334155;
-    }
-
-    .auth-required-btn:hover {
-      background: #1e293b;
-    }
-
     .follow-btn:hover {
       background: #d97706;
     }
@@ -786,17 +750,6 @@
 
     button:hover {
       background: #115e59;
-    }
-
-    .submit-btn {
-      width: 100%;
-    }
-
-    .update-form {
-      display: none;
-      margin-top: 12px;
-      padding-top: 10px;
-      border-top: 1px solid #eee;
     }
 
     input, select {
@@ -857,70 +810,7 @@
       border-radius: 10px;
     }
 
-    .auth-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 1200;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      background: rgba(15, 23, 42, 0.5);
-    }
-
-    .auth-modal.is-open {
-      display: flex;
-    }
-
-    .auth-dialog {
-      width: min(100%, 420px);
-      padding: 22px;
-      border-radius: 16px;
-      background: #ffffff;
-      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.25);
-    }
-
-    .auth-dialog h2 {
-      margin: 0 0 8px;
-      color: #111827;
-      font-size: 24px;
-    }
-
-    .auth-dialog p {
-      margin: 0 0 16px;
-      color: #4b5563;
-      line-height: 1.5;
-    }
-
-    .auth-modal-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .modal-link,
-    .modal-secondary {
-      min-height: 42px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 14px;
-      border-radius: 10px;
-      color: #ffffff;
-      background: #0f766e;
-      font-size: 14px;
-      font-weight: 800;
-      text-decoration: none;
-    }
-
-    .modal-secondary {
-      border: 1px solid #d1d5db;
-      background: #ffffff;
-      color: #172033;
-    }
-
     .discovery-map {
-      --sheet-height: 96px;
       position: relative;
       min-height: calc(100dvh - 190px);
       height: calc(100dvh - 190px);
@@ -952,7 +842,7 @@
     .map-locate-btn {
       position: absolute;
       right: 14px;
-      bottom: calc(var(--sheet-height) + 18px);
+      bottom: 82px;
       z-index: 650;
       width: 46px;
       height: 46px;
@@ -965,96 +855,227 @@
       background: #ffffff;
       color: #0f172a;
       box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
-      transition: bottom 0.22s ease, transform 0.2s ease;
+      transition: transform 0.2s ease;
     }
 
-    .bottom-sheet {
+    .station-action-menu {
+      position: fixed;
+      left: 50%;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      z-index: 950;
+      width: min(100% - 28px, 340px);
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    .station-action-toggle {
+      min-height: 52px;
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 0;
+      padding: 0 22px;
+      border: 1px solid rgba(15, 118, 110, 0.28);
+      border-radius: 999px;
+      background: #0f766e;
+      color: #ffffff;
+      box-shadow: 0 18px 38px rgba(15, 23, 42, 0.28);
+      font-size: 15px;
+      font-weight: 900;
+      pointer-events: auto;
+      transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .station-action-toggle:hover,
+    .station-action-toggle:focus {
+      background: #115e59;
+      box-shadow: 0 20px 44px rgba(15, 23, 42, 0.32);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .station-action-caret {
+      display: inline-block;
+      transition: transform 0.18s ease;
+    }
+
+    .station-action-menu.is-open .station-action-caret {
+      transform: rotate(180deg);
+    }
+
+    .station-action-options {
       position: absolute;
       left: 0;
       right: 0;
-      bottom: 0;
-      z-index: 620;
-      height: var(--sheet-height);
-      display: flex;
-      flex-direction: column;
-      border-radius: 24px 24px 0 0;
-      background: #ffffff;
-      box-shadow: 0 -14px 38px rgba(15, 23, 42, 0.18);
-      transition: height 0.24s ease;
+      bottom: calc(100% + 10px);
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 18px 46px rgba(15, 23, 42, 0.24);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px) scale(0.98);
+      transition: opacity 0.18s ease, transform 0.18s ease;
     }
 
-    .bottom-sheet.is-dragging {
-      transition: none;
+    .station-action-menu.is-open .station-action-options {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
     }
 
-    .sheet-handle {
+    .station-action-option {
+      min-height: 44px;
       width: 100%;
-      min-height: auto;
-      margin: 0;
-      flex: 0 0 auto;
-      padding: 14px 18px 12px;
-      border: none;
-      background: transparent;
-      color: #0f172a;
-      cursor: grab;
-      text-align: left;
-      touch-action: pan-y;
-    }
-
-    .sheet-handle:hover,
-    .sheet-handle:focus {
-      background: transparent;
-      color: #0f172a;
-      outline: none;
-    }
-
-    .sheet-grip {
-      width: 44px;
-      height: 6px;
-      margin: 0 auto 12px;
-      border-radius: 999px;
-      background: #cbd5e1;
-    }
-
-    .sheet-title-row {
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      margin: 0;
+      padding: 0 14px;
+      border: none;
+      border-radius: 12px;
+      background: transparent;
+      color: #172033;
+      font-size: 14px;
+      font-weight: 850;
+      text-align: left;
+      transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
+    }
+
+    .station-action-option:hover,
+    .station-action-option:focus {
+      background: #ecfdf5;
+      color: #0f766e;
+      outline: none;
+      transform: translateX(2px);
+    }
+
+    .station-list-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: none;
+      background: rgba(15, 23, 42, 0.42);
+    }
+
+    .station-list-modal.is-open {
+      display: block;
+    }
+
+    .station-list-panel {
+      width: min(440px, 100%);
+      height: 100dvh;
+      margin-left: auto;
+      display: flex;
+      flex-direction: column;
+      background: #f8fafc;
+      box-shadow: -20px 0 42px rgba(15, 23, 42, 0.22);
+    }
+
+    .station-list-header {
+      flex: 0 0 auto;
+      padding: 16px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #ffffff;
+    }
+
+    .station-list-title-row {
+      display: flex;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
     }
 
-    .sheet-title-row strong {
+    .station-list-title-row h2 {
+      margin: 0;
       color: #0f172a;
-      font-size: 17px;
+      font-size: 20px;
+      line-height: 1.15;
     }
 
-    .sheet-title-row span {
+    .station-list-title-row span {
+      display: block;
+      margin-top: 4px;
       color: #64748b;
       font-size: 12px;
       font-weight: 800;
       text-transform: uppercase;
     }
 
-    .sheet-content {
+    .station-list-close {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      margin: 0;
+      padding: 0;
+      border-radius: 999px;
+      background: #e5e7eb;
+      color: #0f172a;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .station-list-close:hover,
+    .station-list-close:focus {
+      background: #cbd5e1;
+      outline: none;
+    }
+
+    .station-list-content {
       flex: 1 1 auto;
       overflow-y: auto;
       padding: 0 14px 22px;
       overscroll-behavior: contain;
-      touch-action: pan-y;
     }
 
-    .sheet-content .section-heading {
+    .dev-list-tools {
+      display: none;
+      gap: 10px;
+      margin: 12px 0 4px;
+    }
+
+    .station-list-modal.is-all-mode .dev-list-tools {
+      display: grid;
+    }
+
+    .dev-list-tools input,
+    .dev-list-tools select {
+      margin: 0;
+      background: #ffffff;
+    }
+
+    .dev-list-note {
+      display: none;
+      margin-top: 8px;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .station-list-modal.is-all-mode .dev-list-note {
+      display: block;
+    }
+
+    .station-list-content .section-heading {
       margin-top: 12px;
     }
 
-    .sheet-content .card {
+    .station-list-content .card {
       margin: 10px 0;
       border-left-width: 4px;
       box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
       transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     }
 
-    .sheet-content .card.is-selected-station {
+    .station-list-content .card.is-selected-station {
       border-left-color: #2563eb;
       box-shadow: 0 12px 28px rgba(37, 99, 235, 0.16);
       transform: translateY(-1px);
@@ -1083,21 +1104,21 @@
 
     .price-marker {
       position: relative;
-      min-width: 48px;
-      min-height: 30px;
+      min-width: 58px;
+      min-height: 34px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 5px 9px;
-      border: 2px solid #ffffff;
-      border-radius: 999px;
+      padding: 6px 10px 7px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 14px;
       color: #ffffff;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 900;
       line-height: 1;
       letter-spacing: 0;
       white-space: nowrap;
-      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.22);
+      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.26);
       transform: translateY(0) scale(1);
       transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
       animation: markerPop 0.2s ease both;
@@ -1107,24 +1128,24 @@
       content: "";
       position: absolute;
       left: 50%;
-      bottom: -5px;
-      width: 9px;
-      height: 9px;
-      border-right: 2px solid #ffffff;
-      border-bottom: 2px solid #ffffff;
+      bottom: -4px;
+      width: 8px;
+      height: 8px;
+      border-right: 1px solid rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.9);
       background: inherit;
       transform: translateX(-50%) rotate(45deg);
     }
 
-    .price-marker.green { background: #16a34a; }
-    .price-marker.yellow { background: #eab308; color: #172033; }
-    .price-marker.red { background: #dc2626; }
+    .price-marker.green { background: #07885f; }
+    .price-marker.yellow { background: #f5c542; color: #172033; }
+    .price-marker.red { background: #d83a2e; }
     .price-marker.gray { background: #64748b; }
     .price-marker.blue { background: #2563eb; }
 
     .price-marker.is-selected {
-      transform: translateY(-4px) scale(1.12);
-      box-shadow: 0 16px 30px rgba(15, 23, 42, 0.3);
+      transform: translateY(-5px) scale(1.14);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2), 0 18px 34px rgba(15, 23, 42, 0.34);
     }
 
     .price-marker.is-best {
@@ -1143,6 +1164,16 @@
       font-weight: 900;
       box-shadow: 0 6px 14px rgba(15, 23, 42, 0.14);
       transform: translateX(-50%);
+    }
+
+    @media (max-width: 520px) {
+      .price-marker {
+        min-width: 54px;
+        min-height: 32px;
+        padding: 6px 9px;
+        border-radius: 13px;
+        font-size: 12px;
+      }
     }
 
     @keyframes markerPop {
@@ -1197,11 +1228,6 @@
         grid-template-columns: 1fr;
       }
 
-      .hero-actions {
-        display: none;
-      }
-
-
       .discovery-map {
         min-height: calc(100dvh - 258px);
         height: calc(100dvh - 258px);
@@ -1210,6 +1236,14 @@
       .map-locate-btn {
         top: 14px;
         bottom: auto;
+      }
+
+      .station-action-menu {
+        width: min(100% - 24px, 360px);
+      }
+
+      .station-list-panel {
+        width: 100%;
       }
 
       .filters-grid,
@@ -1238,7 +1272,7 @@
         <span>Fuel Tracker</span>
       </a>
       <nav class="desktop-nav" aria-label="Primary">
-        <a class="nav-link" href="#stations">Stations</a>
+        <a class="nav-link" href="#mapSection">Map</a>
       </nav>
     </div>
 
@@ -1249,7 +1283,6 @@
 <nav class="mobile-menu" id="mobileMenu" aria-label="Main menu">
   <div class="menu-panel">
     <a class="menu-link" href="#searchInput">Search Fuel Station Near Me <span>›</span></a>
-    <a class="menu-link" href="login.html">Log In / Sign Up <span>›</span></a>
     <a class="menu-link" href="/partner/login">Station Owner Portal <span>›</span></a>
   </div>
 </nav>
@@ -1274,10 +1307,6 @@
     <datalist id="addressSuggestions"></datalist>
     <div id="searchMeta" class="search-meta"></div>
 
-    <div class="hero-actions">
-      <span class="hero-note">Login is only needed to report prices, save favorites, claim stations, or edit station information.</span>
-    </div>
-
   </div>
 </section>
 
@@ -1293,17 +1322,42 @@
     </div>
 
     <button class="map-locate-btn" id="mapLocateBtn" type="button" aria-label="Center on current location">⌖</button>
-
-    <section class="bottom-sheet" id="bottomSheet" aria-label="Nearby fuel station results">
-      <button class="sheet-handle" id="sheetHandle" type="button" aria-label="Expand station results">
-        <span class="sheet-grip"></span>
-        <span class="sheet-title-row">
-          <strong id="sheetTitle">Nearby Fuel Stations</strong>
-          <span id="resultCount">Loading</span>
-        </span>
+    <div class="station-action-menu" id="stationActionMenu">
+      <div class="station-action-options" id="stationActionOptions" aria-hidden="true">
+        <button class="station-action-option" type="button" data-station-action="nearby">Nearby Stations <span>›</span></button>
+        <button class="station-action-option" type="button" data-station-action="all">All Stations <span>›</span></button>
+        <button class="station-action-option" type="button" data-station-action="favorites">Favorites <span>›</span></button>
+        <button class="station-action-option" type="button" data-station-action="open">Open Stations <span>›</span></button>
+      </div>
+      <button class="station-action-toggle" id="stationActionToggle" type="button" aria-expanded="false" aria-controls="stationActionOptions">
+        View Stations <span class="station-action-caret" aria-hidden="true">▼</span>
       </button>
+    </div>
+  </section>
 
-      <div class="sheet-content" id="sheetContent">
+  <div class="station-list-modal" id="stationListModal" aria-hidden="true">
+    <aside class="station-list-panel" role="dialog" aria-modal="true" aria-labelledby="stationListTitle">
+      <div class="station-list-header">
+        <div class="station-list-title-row">
+          <div>
+            <h2 id="stationListTitle">Nearby Fuel Stations</h2>
+            <span id="resultCount">Loading</span>
+          </div>
+          <button class="station-list-close" id="stationListClose" type="button" aria-label="Close station list">×</button>
+        </div>
+      </div>
+
+      <div class="station-list-content" id="stationListContent">
+        <div class="dev-list-tools" aria-label="Development station list controls">
+          <input id="allStationsSearch" type="search" placeholder="Search all stations..." aria-label="Search all stations">
+          <select id="allStationsSort" aria-label="Sort all stations">
+            <option value="alphabetical">Alphabetical</option>
+            <option value="cheapest">Cheapest fuel</option>
+            <option value="brand">Brand</option>
+          </select>
+          <div class="dev-list-note">Temporary testing view: shows every stored station and bypasses nearby location filtering.</div>
+        </div>
+
         <div class="controls">
           <div class="product-tabs" id="productTabs" aria-label="Fuel product filter">
             <button class="product-tab active" type="button" data-product="all">All</button>
@@ -1374,21 +1428,9 @@
         </div>
         <div id="stations"></div>
       </div>
-    </section>
-  </section>
-
-</div>
-
-<div class="auth-modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
-  <div class="auth-dialog">
-    <h2 id="authModalTitle">Login required for this action</h2>
-    <p id="authModalMessage">You can keep browsing stations and prices without an account. Login or sign up when you want to save or contribute.</p>
-    <div class="auth-modal-actions">
-      <a class="modal-link" href="login.html">Log In</a>
-      <a class="modal-link" href="login.html?mode=signup">Sign Up</a>
-      <button class="modal-secondary" type="button" id="authModalClose">Keep Browsing</button>
-    </div>
+    </aside>
   </div>
+
 </div>
 
 <script
@@ -1398,9 +1440,6 @@
 ></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script>
-function getToken() {
-  return localStorage.getItem("token");
-}
 let userLocation = null;
 let userLocationSource = "device";
 let locationSet = false;
@@ -1414,6 +1453,7 @@ let bestPriceStationId = null;
 let currentPriceStats = { min: null, max: null, average: null };
 let allStations = [];
 let stationSortMode = "nearest";
+let stationListMode = "nearby";
 let mapHasSettled = false;
 const warnedCoordinateStations = new Set();
 let coordinateDensityIndex = new Map();
@@ -1429,6 +1469,7 @@ const LAGOS_CENTER = { lat: 6.5244, lng: 3.3792 };
 const NEARBY_RADIUS_KM = 10;
 const MAX_NEARBY_RESULTS = 80;
 const TEMPORARY_NEARBY_DEBUG_LOGS = true;
+const REMOTE_API_ORIGIN = "http://localhost:3000";
 const LAGOS_COORDINATE_BOUNDS = {
   minLat: 6.2,
   maxLat: 6.85,
@@ -1470,8 +1511,6 @@ const PRIORITY_AREA_ANCHORS = {
   idimu: { lat: 6.583, lng: 3.286 },
   egbeda: { lat: 6.595, lng: 3.289 }
 };
-const loginUrl = "login.html";
-const signupUrl = "login.html?mode=signup";
 const fuelProducts = [
   { key: "pms", label: "Petrol", code: "PMS" },
   { key: "ago", label: "Diesel", code: "AGO" },
@@ -1479,6 +1518,66 @@ const fuelProducts = [
   { key: "lpg", label: "Cooking Gas", code: "LPG" }
 ];
 let activeProductFilter = "all";
+
+async function apiFetch(path, options) {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const useRemoteFirst = window.location.protocol === "file:";
+  const primaryUrl = useRemoteFirst ? `${REMOTE_API_ORIGIN}${normalizedPath}` : normalizedPath;
+  const fallbackUrl = useRemoteFirst ? normalizedPath : `${REMOTE_API_ORIGIN}${normalizedPath}`;
+  const fetchOptions = {
+    ...options,
+    headers: {
+      ...(options?.headers || {})
+    }
+  };
+
+  delete fetchOptions.headers.Authorization;
+  delete fetchOptions.headers.authorization;
+
+  try {
+    const response = await fetch(primaryUrl, fetchOptions);
+    console.log("PUBLIC API DEBUG: response", {
+      path: normalizedPath,
+      url: primaryUrl,
+      status: response.status,
+      ok: response.ok
+    });
+
+    if ((response.status === 401 || response.status === 403) && normalizedPath === "/stations") {
+      console.error("PUBLIC API DEBUG: station fetch was blocked by auth", {
+        status: response.status,
+        url: primaryUrl
+      });
+    }
+
+    if (!response.ok && fallbackUrl !== primaryUrl && !useRemoteFirst) {
+      console.warn("PUBLIC API DEBUG: primary API returned an error; retrying fallback", {
+        path: normalizedPath,
+        status: response.status,
+        fallbackUrl
+      });
+      const fallbackResponse = await fetch(fallbackUrl, fetchOptions);
+      console.log("PUBLIC API DEBUG: fallback response", {
+        path: normalizedPath,
+        url: fallbackUrl,
+        status: fallbackResponse.status,
+        ok: fallbackResponse.ok
+      });
+      return fallbackResponse;
+    }
+
+    return response;
+  } catch (error) {
+    if (primaryUrl === fallbackUrl) throw error;
+    console.warn("PUBLIC API DEBUG: primary API request failed; retrying fallback", {
+      path: normalizedPath,
+      primaryUrl,
+      fallbackUrl,
+      error
+    });
+    return fetch(fallbackUrl, fetchOptions);
+  }
+}
 
 function requestUserLocation() {
   const locationBtn = document.getElementById("getLocationBtn");
@@ -1570,7 +1669,7 @@ function requestUserLocation() {
 
 function attemptApproximateLocationFallback({ denied, timeout, locationBtn, previousLocationText }) {
   setSearchMeta("Using approximate network location...", true);
-  fetch("https://fuel-tracker-w4ym.onrender.com/api/location/ip")
+  fetch("http://localhost:3000/api/location/ip")
     .then(res => res.ok ? res.json() : Promise.reject(new Error(`IP location failed: ${res.status}`)))
     .then(payload => {
       const result = payload?.result || {};
@@ -1756,20 +1855,20 @@ const favoriteAlertsFilter = document.getElementById("favoriteAlertsFilter");
 const mapSection = document.querySelector(".map-section");
 const menuToggle = document.getElementById("menuToggle");
 const mobileMenu = document.getElementById("mobileMenu");
-const authModal = document.getElementById("authModal");
-const authModalClose = document.getElementById("authModalClose");
-const authModalTitle = document.getElementById("authModalTitle");
-const authModalMessage = document.getElementById("authModalMessage");
-const bottomSheet = document.getElementById("bottomSheet");
-const sheetHandle = document.getElementById("sheetHandle");
-const sheetTitle = document.getElementById("sheetTitle");
-const sheetContent = document.getElementById("sheetContent");
+const stationListModal = document.getElementById("stationListModal");
+const stationListClose = document.getElementById("stationListClose");
+const stationActionMenu = document.getElementById("stationActionMenu");
+const stationActionToggle = document.getElementById("stationActionToggle");
+const stationActionOptions = document.getElementById("stationActionOptions");
+const stationListTitle = document.getElementById("stationListTitle");
 const resultCount = document.getElementById("resultCount");
 const discoveryMap = document.querySelector(".discovery-map");
 const mapLocateBtn = document.getElementById("mapLocateBtn");
 const sortModeLabel = document.getElementById("sortModeLabel");
 const addressSuggestions = document.getElementById("addressSuggestions");
 const searchMeta = document.getElementById("searchMeta");
+const allStationsSearch = document.getElementById("allStationsSearch");
+const allStationsSort = document.getElementById("allStationsSort");
 
 if (mapSection) {
   mapSection.addEventListener("toggle", () => {
@@ -1800,14 +1899,6 @@ function isFavoriteStation(stationId) {
 }
 
 function toggleFavorite(stationId) {
-  if (!getToken()) {
-    showAuthModal(
-      "Login to save favorites",
-      "Browsing stations and checking prices is open to everyone. Log in or sign up when you want to save favorite stations."
-    );
-    return;
-  }
-
   const id = String(stationId);
   const favorites = getFavoriteStationIds();
   const exists = favorites.includes(id);
@@ -1825,14 +1916,52 @@ function setMenuOpen(isOpen) {
   menuToggle.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
 }
 
-function showAuthModal(title, message) {
-  authModalTitle.textContent = title;
-  authModalMessage.textContent = message;
-  authModal.classList.add("is-open");
+function setStationListMode(mode) {
+  stationListMode = mode === "all" ? "all" : "nearby";
+  stationListModal?.classList.toggle("is-all-mode", stationListMode === "all");
 }
 
-function closeAuthModal() {
-  authModal.classList.remove("is-open");
+function setStationActionMenuOpen(isOpen) {
+  if (!stationActionMenu || !stationActionToggle || !stationActionOptions) return;
+  stationActionMenu.classList.toggle("is-open", isOpen);
+  stationActionToggle.setAttribute("aria-expanded", String(isOpen));
+  stationActionOptions.setAttribute("aria-hidden", String(!isOpen));
+}
+
+function openStationList(mode = "nearby") {
+  if (!stationListModal) return;
+  setStationActionMenuOpen(false);
+  setStationListMode(mode);
+  if (stationListMode === "all") {
+    activeProductFilter = "all";
+    if (allStationsSearch) allStationsSearch.value = "";
+    productTabs?.querySelectorAll(".product-tab").forEach(button => {
+      button.classList.toggle("active", button.dataset.product === "all");
+    });
+  }
+  if (stationListMode === "all" && allStations.length === 0 && !stationLoadPending) {
+    loadStations({ fitMap: true });
+  }
+  applyStationFilters({ fitMap: stationListMode === "all" });
+  stationListModal.classList.add("is-open");
+  stationListModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("station-list-open");
+  if (stationListMode === "all" && allStationsSearch) {
+    allStationsSearch.focus();
+  } else if (stationListClose) {
+    stationListClose.focus();
+  }
+}
+
+function closeStationList() {
+  if (!stationListModal) return;
+  stationListModal.classList.remove("is-open");
+  stationListModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("station-list-open");
+  if (stationListMode === "all") {
+    setStationListMode("nearby");
+    applyStationFilters();
+  }
 }
 
 menuToggle.addEventListener("click", () => {
@@ -1845,17 +1974,54 @@ mobileMenu.addEventListener("click", event => {
   }
 });
 
-authModalClose.addEventListener("click", closeAuthModal);
-authModal.addEventListener("click", event => {
-  if (event.target === authModal) {
-    closeAuthModal();
+stationActionToggle.addEventListener("click", () => {
+  setStationActionMenuOpen(!stationActionMenu.classList.contains("is-open"));
+});
+
+stationActionOptions.addEventListener("click", event => {
+  const actionButton = event.target.closest("[data-station-action]");
+  if (!actionButton) return;
+
+  const action = actionButton.dataset.stationAction;
+  if (action === "nearby") {
+    if (favoritesFilter) favoritesFilter.checked = false;
+    openStationList("nearby");
+    return;
+  }
+
+  if (action === "all") {
+    if (favoritesFilter) favoritesFilter.checked = false;
+    openStationList("all");
+    return;
+  }
+
+  if (action === "favorites") {
+    if (favoritesFilter) favoritesFilter.checked = true;
+    openStationList("nearby");
+    return;
+  }
+
+  setStationActionMenuOpen(false);
+  setSearchMeta("Open Stations filter coming soon.");
+});
+
+document.addEventListener("click", event => {
+  if (!stationActionMenu || stationActionMenu.contains(event.target)) return;
+  setStationActionMenuOpen(false);
+});
+
+stationListClose.addEventListener("click", closeStationList);
+stationListModal.addEventListener("click", event => {
+  if (event.target === stationListModal) {
+    closeStationList();
   }
 });
 
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
     setMenuOpen(false);
-    closeAuthModal();
+    setStationActionMenuOpen(false);
+    closeStationList();
   }
 });
 
@@ -2199,11 +2365,7 @@ function initMap() {
     attribution: "&copy; OpenStreetMap contributors"
   }).addTo(map);
 
-  stationMarkersLayer = L.markerClusterGroup({
-    showCoverageOnHover: false,
-    spiderfyOnMaxZoom: true,
-    maxClusterRadius: 45
-  });
+  stationMarkersLayer = L.layerGroup();
   map.addLayer(stationMarkersLayer);
   map.on("moveend zoomend", () => {
     mapHasSettled = true;
@@ -2251,6 +2413,25 @@ function getMarkerColor(station) {
   return "yellow";
 }
 
+function getStationExactLatLng(station) {
+  if (!station) return null;
+  const candidates = getStationCoordinateCandidates(station);
+  for (const [rawLat, rawLng] of candidates) {
+    const lat = numericCoordinate(rawLat);
+    const lng = numericCoordinate(rawLng);
+    if (isValidStationCoordinate(lat, lng)) {
+      return { lat, lng, approximate: false, source: "station" };
+    }
+  }
+  return null;
+}
+
+function getMapMarkerStations() {
+  return Array.isArray(allStations)
+    ? allStations.filter(station => station && getStationExactLatLng(station))
+    : [];
+}
+
 function getDirectionsUrl(station) {
   const point = getStationLatLng(station);
   if (!point) return "#";
@@ -2261,9 +2442,8 @@ function getDirectionsUrl(station) {
 
 function selectStationFromMap(stationId) {
   selectedStationId = String(stationId);
-  const heights = getSheetHeights();
-  setBottomSheetHeight(Math.max(heights.mid, heights.collapsed));
-  updateMapStations(window.currentDisplayedStations || []);
+  openStationList(stationListMode);
+  updateMapStations(getMapMarkerStations());
 
   window.requestAnimationFrame(() => {
     const card = document.getElementById(`station-card-${stationId}`);
@@ -2276,18 +2456,39 @@ function selectStationFromMap(stationId) {
   });
 }
 
-function createStationMarker(station, isCheapest) {
+function focusStationOnMap(stationId) {
+  const station = allStations.find((item, index) => getStationDebugId(item, index) === String(stationId) || String(item?._id) === String(stationId));
   const point = getStationLatLng(station);
+  selectedStationId = String(stationId);
+  if (map && point) {
+    map.flyTo([point.lat, point.lng], 15, { duration: 0.7 });
+  }
+  updateMapStations(getMapMarkerStations());
+
+  window.requestAnimationFrame(() => {
+    const card = document.getElementById(`station-card-${stationId}`);
+    if (!card) return;
+    document.querySelectorAll(".is-selected-station").forEach(element => {
+      element.classList.remove("is-selected-station");
+    });
+    card.classList.add("is-selected-station");
+  });
+}
+
+function createStationMarker(station, isCheapest) {
+  const point = getStationExactLatLng(station);
   if (!point) return null;
   const markerColor = getMarkerColor(station);
   const isSelected = selectedStationId === String(station._id);
   const isBest = bestPriceStationId !== null && station._id === bestPriceStationId;
   const bestLabel = isBest ? '<span class="best-flag">Best Price</span>' : "";
+  const markerText = formatMarkerPrice(station);
+  const markerWidth = Math.max(58, Math.min(96, markerText.length * 9 + 22));
   const icon = L.divIcon({
     className: "",
-    html: `<div class="price-marker ${markerColor} ${isSelected ? "is-selected" : ""} ${isBest ? "is-best" : ""}">${bestLabel}${formatMarkerPrice(station)}</div>`,
-    iconSize: [64, 38],
-    iconAnchor: [32, 38],
+    html: `<div class="price-marker ${markerColor} ${isSelected ? "is-selected" : ""} ${isBest ? "is-best" : ""}">${bestLabel}${markerText}</div>`,
+    iconSize: [markerWidth, 42],
+    iconAnchor: [markerWidth / 2, 42],
     popupAnchor: [0, -36]
   });
 
@@ -2309,7 +2510,7 @@ function updateMapStations(stations, options = {}) {
   const cheapestStationId = bestPriceStationId;
 
   stations.forEach(station => {
-    const point = getStationLatLng(station);
+    const point = getStationExactLatLng(station);
     if (!point) {
       if (TEMPORARY_NEARBY_DEBUG_LOGS) {
         console.warn("MAP DEBUG missing station coordinates:", {
@@ -2492,6 +2693,30 @@ function getSmartStationScore(station) {
 }
 
 function sortStationsSmartly(stations) {
+  if (stationListMode === "all") {
+    const sortMode = allStationsSort?.value || "alphabetical";
+    return [...stations].sort((a, b) => {
+      if (sortMode === "cheapest") {
+        const priceA = normalizeProduct("pms", a).price;
+        const priceB = normalizeProduct("pms", b).price;
+        if (Number.isFinite(priceA) && Number.isFinite(priceB) && priceA !== priceB) return priceA - priceB;
+        if (Number.isFinite(priceA)) return -1;
+        if (Number.isFinite(priceB)) return 1;
+      }
+
+      if (sortMode === "brand") {
+        const brandA = (a.brand || a.name || "").toLowerCase();
+        const brandB = (b.brand || b.name || "").toLowerCase();
+        const brandCompare = brandA.localeCompare(brandB);
+        if (brandCompare !== 0) return brandCompare;
+      }
+
+      const nameA = (a.name || "").toLowerCase();
+      const nameB = (b.name || "").toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  }
+
   if (stationSortMode === "cheapest") {
     return [...stations].sort((a, b) => {
       const priceA = getStationPrice(a);
@@ -2651,54 +2876,6 @@ function renderProductSummary(station) {
   return fuelSummary + evSummary;
 }
 
-function renderProductReportFields(station) {
-  return getStationProducts(station).map(product => `
-    <label>${product.label} (${product.code}) price</label>
-    <input type="number" id="${product.key}-price-${station._id}" placeholder="${product.code} price" value="${Number.isFinite(product.price) ? product.price : ""}">
-
-    <label>${product.label} (${product.code}) availability</label>
-    <select id="${product.key}-status-${station._id}">
-      <option value="Available" ${product.status === "Available" ? "selected" : ""}>Available</option>
-      <option value="Low Stock" ${product.status === "Low Stock" ? "selected" : ""}>Low Stock</option>
-      <option value="Out of Stock" ${product.status === "Out of Stock" ? "selected" : ""}>Out of Stock</option>
-    </select>
-  `).join("") + renderEvReportFields(station);
-}
-
-function renderEvReportFields(station) {
-  const ev = normalizeEvCharging(station);
-  return `
-    <div class="ev-card">
-      <div class="ev-title">⚡ EV Charging</div>
-
-      <label>EV charging support</label>
-      <select id="ev-enabled-${station._id}">
-        <option value="true" ${ev.enabled ? "selected" : ""}>Enabled</option>
-        <option value="false" ${!ev.enabled ? "selected" : ""}>Disabled</option>
-      </select>
-
-      <label>Charger availability</label>
-      <select id="ev-availability-${station._id}">
-        <option value="Available" ${ev.availability === "Available" ? "selected" : ""}>Available</option>
-        <option value="Limited" ${ev.availability === "Limited" ? "selected" : ""}>Limited</option>
-        <option value="Unavailable" ${ev.availability === "Unavailable" ? "selected" : ""}>Unavailable</option>
-        <option value="Out of Service" ${ev.availability === "Out of Service" ? "selected" : ""}>Out of Service</option>
-      </select>
-
-      <label>Charger type</label>
-      <select id="ev-type-${station._id}">
-        ${["Fast Charger", "Type 2", "CCS", "CHAdeMO"].map(type => `<option value="${type}" ${ev.chargerType === type ? "selected" : ""}>${type}</option>`).join("")}
-      </select>
-
-      <label>Price per kWh</label>
-      <input type="number" id="ev-price-${station._id}" min="0" step="1" placeholder="EV price per kWh" value="${Number.isFinite(ev.pricePerKwh) ? ev.pricePerKwh : ""}">
-
-      <label>Available charging ports</label>
-      <input type="number" id="ev-ports-${station._id}" min="0" step="1" placeholder="Available ports" value="${Number.isFinite(ev.availablePorts) ? ev.availablePorts : ""}">
-    </div>
-  `;
-}
-
 function getPriceTrend(latestReport, previousReport) {
   const productKey = activeProductFilter === "all" ? "pms" : activeProductFilter;
   const latestPrice = getReportPrice(latestReport?.products?.[productKey] || latestReport);
@@ -2776,13 +2953,195 @@ function isStationInVisibleMapArea(station) {
   return getStationDistance(station) <= NEARBY_RADIUS_KM;
 }
 
+function getStationDebugId(station, index = 0) {
+  return String(station?._id || station?.id || station?.name || `station-${index + 1}`);
+}
+
+function warnMalformedStation(station, index) {
+  const problems = [];
+  if (!station || typeof station !== "object") {
+    problems.push("not an object");
+  } else {
+    if (!station.name) problems.push("missing name");
+    if (!getStationFullAddress(station)) problems.push("missing address");
+    if (!getStationLatLng(station)) problems.push("missing coordinates");
+    if (!station.products && !station.latestReport?.products && station.price === undefined) problems.push("missing fuel prices");
+  }
+
+  if (problems.length) {
+    console.warn("Malformed station object in all-stations view:", {
+      index,
+      stationId: getStationDebugId(station, index),
+      problems,
+      station
+    });
+  }
+}
+
+function getAllStationsSearchText() {
+  return (allStationsSearch?.value || "").trim().toLowerCase();
+}
+
+function stationMatchesAllStationsSearch(station, searchText) {
+  if (!searchText) return true;
+  const productsText = getStationProducts(station).map(product => `${product.label} ${product.code} ${product.status}`).join(" ");
+  const ev = normalizeEvCharging(station);
+  return [
+    station?.name,
+    station?.brand,
+    station?.area,
+    getStationFullAddress(station),
+    productsText,
+    ev.enabled ? `ev charging ${ev.availability} ${ev.chargerType}` : ""
+  ].join(" ").toLowerCase().includes(searchText);
+}
+
+function sortAllStationsForDev(stations) {
+  const sortMode = allStationsSort?.value || "alphabetical";
+  return [...stations].sort((a, b) => {
+    if (sortMode === "cheapest") {
+      const priceA = normalizeProduct("pms", a).price;
+      const priceB = normalizeProduct("pms", b).price;
+      if (Number.isFinite(priceA) && Number.isFinite(priceB) && priceA !== priceB) return priceA - priceB;
+      if (Number.isFinite(priceA)) return -1;
+      if (Number.isFinite(priceB)) return 1;
+    }
+
+    if (sortMode === "brand") {
+      const brandA = (a?.brand || a?.name || "").toLowerCase();
+      const brandB = (b?.brand || b?.name || "").toLowerCase();
+      const brandCompare = brandA.localeCompare(brandB);
+      if (brandCompare !== 0) return brandCompare;
+    }
+
+    return (a?.name || "").toLowerCase().localeCompare((b?.name || "").toLowerCase());
+  });
+}
+
+function renderDevFuelSummary(station) {
+  return getStationProducts(station).map(product => `
+    <div class="product-card">
+      <div class="product-head">
+        <span class="product-name">
+          ${product.label || "Fuel"}
+          <small>${product.code || "N/A"}</small>
+        </span>
+        <span class="badge ${getBadgeClass(product.status, "fuel")}">${product.status || "Unknown"}</span>
+      </div>
+      <div class="product-price">${formatPrice(product.price)}</div>
+      <div class="product-time">${formatProductUpdated(product.lastUpdated)}</div>
+    </div>
+  `).join("");
+}
+
+function renderAllStationsForDev(options = {}) {
+  if (!container) return;
+  container.innerHTML = "";
+
+  const sourceStations = Array.isArray(allStations) ? allStations.filter(station => station && typeof station === "object") : [];
+  const searchText = getAllStationsSearchText();
+  sourceStations.forEach(warnMalformedStation);
+
+  let data = sourceStations.filter(station => stationMatchesAllStationsSearch(station, searchText));
+  data = sortAllStationsForDev(data);
+
+  console.log("ALL STATIONS DEBUG: total station count loaded", allStations.length);
+  console.log("ALL STATIONS DEBUG: rendered station count", data.length);
+
+  window.currentDisplayedStations = data;
+  updatePriceStats(data);
+  updateMapStations(getMapMarkerStations(), {
+    fitMap: Boolean(options.fitMap),
+    centerUser: false
+  });
+
+  if (resultCount) {
+    resultCount.textContent = `${data.length} of ${allStations.length} ${allStations.length === 1 ? "station" : "stations"}`;
+  }
+  if (stationListTitle) stationListTitle.textContent = "All Fuel Stations";
+  if (sortModeLabel) sortModeLabel.textContent = "Temporary all-stations view";
+
+  if (data.length === 0) {
+    container.innerHTML = `<div class="empty">${stationLoadPending ? "Loading stations..." : "No stations found in the loaded station dataset."}</div>`;
+    return;
+  }
+
+  data.forEach((station, index) => {
+    const stationId = getStationDebugId(station, index);
+    const point = getStationLatLng(station);
+    const fullAddress = getStationFullAddress(station) || "Address not provided";
+    const coordinateText = point
+      ? `${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}${point.approximate ? " (approx.)" : ""}`
+      : "Coordinates not provided";
+    const ev = normalizeEvCharging(station);
+    const currentProduct = normalizeProduct("pms", station);
+    const freshnessStatus = getFreshnessStatus(getStationLastUpdated(station));
+    const isSelected = selectedStationId === String(station._id);
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.id = `station-card-${stationId}`;
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+    if (isSelected) card.classList.add("is-selected-station");
+
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="station-name">${station.name || "Unnamed station"}</div>
+      </div>
+      <div class="station-meta">
+        <div class="info">📍 ${station.area || "Area not provided"}</div>
+        <div class="info">🏷 ${station.brand || "Brand not provided"}</div>
+        <div class="info">🏠 ${fullAddress}</div>
+        <div class="info">🧭 ${coordinateText}</div>
+        <div class="info">💰 PMS: <strong>${formatPrice(currentProduct.price)}</strong></div>
+        <div class="info">${freshnessStatus}</div>
+      </div>
+      <div class="product-grid">
+        ${renderDevFuelSummary(station)}
+      </div>
+      ${ev.enabled ? renderEvChargingCard(station) : `<div class="info">⚡ EV charging: Not available</div>`}
+      <div class="product-summary">
+        ${renderProductSummary(station)}
+      </div>
+      <div class="station-actions">
+        <a class="directions-btn" href="${getDirectionsUrl(station)}" target="_blank" rel="noopener">Directions</a>
+        <button class="follow-btn" onclick="toggleFavorite('${station._id || stationId}')">
+          ${isFavoriteStation(station._id || stationId) ? "⭐ Unfollow" : "⭐ Follow"}
+        </button>
+        <a class="directions-btn" href="/partner/login">Owner update</a>
+      </div>
+    `;
+
+    card.addEventListener("click", event => {
+      if (event.target.closest("a, button, input, select, textarea")) return;
+      focusStationOnMap(station._id || stationId);
+    });
+    card.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      focusStationOnMap(station._id || stationId);
+    });
+
+    container.appendChild(card);
+  });
+}
+
 function applyStationFilters(options = {}) {
   if (!container) return;
   let data = Array.isArray(allStations) ? [...allStations] : [];
   container.innerHTML = "";
 
-  const searchText = searchInput.value.trim().toLowerCase();
-  const searchingCurrentLocation = isCurrentLocationSearch(searchText);
+  const allMode = stationListMode === "all";
+  if (allMode) {
+    renderAllStationsForDev(options);
+    return;
+  }
+
+  const searchText = allMode
+    ? (allStationsSearch?.value || "").trim().toLowerCase()
+    : searchInput.value.trim().toLowerCase();
+  const searchingCurrentLocation = !allMode && isCurrentLocationSearch(searchText);
 
   data = data.filter(station =>
     searchingCurrentLocation ||
@@ -2794,26 +3153,28 @@ function applyStationFilters(options = {}) {
     (searchText.includes("charging") && stationHasEvCharging(station))
   );
 
-  const selectedArea = normalizeAreaName(areaFilter.value);
-  if (selectedArea) {
-    data = data.filter(station => normalizeAreaName(station.area) === selectedArea);
+  const selectedArea = allMode ? "" : normalizeAreaName(areaFilter.value);
+  if (!allMode) {
+    if (selectedArea) {
+      data = data.filter(station => normalizeAreaName(station.area) === selectedArea);
+    }
+
+    if (isEvFilterActive()) {
+      data = data.filter(station => stationHasEvCharging(station));
+    }
+
+    if (fuelFilter.checked) {
+      data = data.filter(station => {
+        return stationHasAvailableProduct(station);
+      });
+    }
+
+    if (favoritesFilter.checked) {
+      data = data.filter(station => isFavoriteStation(station._id));
+    }
   }
 
-  if (isEvFilterActive()) {
-    data = data.filter(station => stationHasEvCharging(station));
-  }
-
-  if (fuelFilter.checked) {
-    data = data.filter(station => {
-      return stationHasAvailableProduct(station);
-    });
-  }
-
-  if (favoritesFilter.checked) {
-    data = data.filter(station => isFavoriteStation(station._id));
-  }
-
-  if (!searchText && !selectedArea && !favoritesFilter.checked) {
+  if (!allMode && !searchText && !selectedArea && !favoritesFilter.checked) {
     if (userLocation) {
       const byDistance = data
         .map(station => ({
@@ -2847,18 +3208,34 @@ function applyStationFilters(options = {}) {
   }
 
   data = sortStationsSmartly(data);
+  if (allMode && TEMPORARY_NEARBY_DEBUG_LOGS) {
+    console.log("ALL STATIONS DEBUG", {
+      storedStations: allStations.length,
+      displayedStations: data.length,
+      searchText,
+      sort: allStationsSort?.value || "alphabetical"
+    });
+  }
   window.currentDisplayedStations = data;
   updatePriceStats(data);
   if (resultCount) {
     resultCount.textContent = `${data.length} ${data.length === 1 ? "station" : "stations"}`;
   }
-  if (sheetTitle) {
-    sheetTitle.textContent = userLocation ? "Nearby Fuel Stations" : "Fuel Stations";
+  if (stationListTitle) {
+    stationListTitle.textContent = allMode
+      ? "All Fuel Stations"
+      : userLocation
+      ? "Nearby Fuel Stations"
+      : "Fuel Stations";
   }
   if (sortModeLabel) {
-    sortModeLabel.textContent = stationSortMode === "cheapest" ? "Sorted by price" : "Sorted by distance";
+    sortModeLabel.textContent = allMode
+      ? `Temporary all-stations view`
+      : stationSortMode === "cheapest"
+      ? "Sorted by price"
+      : "Sorted by distance";
   }
-  updateMapStations(data, {
+  updateMapStations(getMapMarkerStations(), {
     fitMap: Boolean(options.fitMap),
     centerUser: Boolean(options.centerUser)
   });
@@ -2889,6 +3266,8 @@ function applyStationFilters(options = {}) {
         const card = document.createElement("div");
         card.className = "card";
         card.id = `station-card-${station._id}`;
+        card.setAttribute("role", "button");
+        card.setAttribute("tabindex", "0");
         if (selectedStationId === String(station._id)) {
           card.classList.add("is-selected-station");
         }
@@ -2908,6 +3287,7 @@ function applyStationFilters(options = {}) {
           ${isCheapest ? `<div class="info"><span class="badge cheapest-badge">Best Price</span></div>` : ""}
           <div class="station-meta">
             <div class="info">📍 ${station.area}</div>
+            ${station.brand ? `<div class="info">🏷 ${station.brand}</div>` : ""}
             ${fullAddress ? `<div class="info">🏠 ${fullAddress}</div>` : ""}
             ${fullAddress ? `<div class="info">🧭 ${getGeocodeConfidenceLabel(station)}</div>` : ""}
             <div class="info">📏 ${distanceText}</div>
@@ -2948,29 +3328,19 @@ function applyStationFilters(options = {}) {
             <button class="follow-btn" onclick="toggleFavorite('${station._id}')">
               ${isFavorite ? "⭐ Unfollow" : "⭐ Follow"}
             </button>
-            ${getToken()
-              ? `<button onclick="toggleForm('${station._id}')">Report Update</button>`
-              : `<button class="auth-required-btn" onclick="requireAuthFor('report')">Report Update</button>`}
-          </div>
-          <div class="update-form" id="form-${station._id}">
-            ${renderProductReportFields(station)}
-
-            <select id="open-${station._id}">
-              <option value="">Open or Closed?</option>
-              <option value="true">Open</option>
-              <option value="false">Closed</option>
-            </select>
-
-            <select id="queue-${station._id}">
-              <option value="">Queue Level</option>
-              <option value="short">Short</option>
-              <option value="medium">Medium</option>
-              <option value="long">Long</option>
-            </select>
-
-            <button class="submit-btn" onclick="submitReport('${station._id}')">Submit Report</button>
+            <a class="directions-btn" href="/partner/login">Owner update</a>
           </div>
         `;
+
+        card.addEventListener("click", event => {
+          if (event.target.closest("a, button, input, select, textarea")) return;
+          focusStationOnMap(station._id);
+        });
+        card.addEventListener("keydown", event => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          focusStationOnMap(station._id);
+        });
 
         container.appendChild(card);
       });
@@ -2979,19 +3349,39 @@ function applyStationFilters(options = {}) {
 function loadStations(options = {}) {
   stationLoadPending = true;
   if (resultCount) resultCount.textContent = "Loading...";
-  fetch("https://fuel-tracker-w4ym.onrender.com/stations")
-    .then(res => res.json())
+  fetch("http://localhost:3000/stations")
+    .then(async res => {
+      console.log("STATIONS DEBUG: /stations API response", {
+        status: res.status,
+        ok: res.ok,
+        unauthorized: res.status === 401 || res.status === 403
+      });
+      if (res.status === 401 || res.status === 403) {
+        throw new Error(`Stations API is still protected by auth (${res.status})`);
+      }
+      if (!res.ok) {
+        throw new Error(`Stations failed: ${res.status}`);
+      }
+      const payload = await res.json();
+      console.log("STATIONS DEBUG: raw station API payload", payload);
+      return payload;
+    })
     .then(data => {
       allStations = Array.isArray(data) ? data : [];
+      console.log("STATIONS DEBUG: total station count loaded into frontend state", allStations.length);
+      if (!Array.isArray(data)) {
+        console.error("STATIONS DEBUG: expected station array but received", data);
+      }
       auditStationMapData(allStations);
-      applyStationFilters(options);
       stationLoadPending = false;
+      applyStationFilters(options);
       if (!autocompletePending) setSearchMeta("");
     })
     .catch(error => {
       stationLoadPending = false;
-      console.error("Failed to load stations:", error);
+      console.error("STATIONS DEBUG: failed fetch error", error);
       setSearchMeta("Could not load stations. Please retry.");
+      applyStationFilters(options);
     });
 }
 
@@ -3008,7 +3398,7 @@ function requestAutocomplete(inputValue) {
   autocompletePending = true;
   setSearchMeta("Loading address suggestions...", true);
 
-  fetch(`https://fuel-tracker-w4ym.onrender.com/api/location/autocomplete?q=${encodeURIComponent(text)}`)
+  apiFetch(`/api/location/autocomplete?q=${encodeURIComponent(text)}`)
     .then(res => res.ok ? res.json() : Promise.reject(new Error(`Autocomplete failed: ${res.status}`)))
     .then(payload => {
       if (requestId !== autocompleteRequestState.requestId) return;
@@ -3035,7 +3425,7 @@ function requestAddressGeocode(inputValue) {
   const requestId = geocodeRequestState.requestId;
   setSearchMeta("Resolving address coordinates...", true);
 
-  fetch(`https://fuel-tracker-w4ym.onrender.com/api/location/geocode?q=${encodeURIComponent(text)}`)
+  apiFetch(`/api/location/geocode?q=${encodeURIComponent(text)}`)
     .then(res => res.ok ? res.json() : Promise.reject(new Error(`Geocode failed: ${res.status}`)))
     .then(payload => {
       if (requestId !== geocodeRequestState.requestId) return;
@@ -3056,77 +3446,8 @@ function requestAddressGeocode(inputValue) {
     });
 }
 
-function toggleForm(stationId) {
-  const form = document.getElementById(`form-${stationId}`);
-  form.style.display = form.style.display === "block" ? "none" : "block";
-}
-
-function convertToBoolean(value) {
-  if (value === "true") return true;
-  if (value === "false") return false;
-  return null;
-}
-
-function submitReport(stationId) {
-
-  if (!getToken()) {
-    requireAuthFor("report");
-    return;
-  }
-
-  const products = fuelProducts.reduce((acc, product) => {
-    const priceInput = document.getElementById(`${product.key}-price-${stationId}`);
-    const statusInput = document.getElementById(`${product.key}-status-${stationId}`);
-    acc[product.key] = {
-      price: priceInput.value,
-      status: statusInput.value
-    };
-    return acc;
-  }, {});
-  const pmsProduct = products.pms || {};
-  const evCharging = {
-    enabled: document.getElementById(`ev-enabled-${stationId}`).value === "true",
-    availability: document.getElementById(`ev-availability-${stationId}`).value,
-    chargerType: document.getElementById(`ev-type-${stationId}`).value,
-    pricePerKwh: document.getElementById(`ev-price-${stationId}`).value,
-    availablePorts: document.getElementById(`ev-ports-${stationId}`).value
-  };
-  const isOpen = convertToBoolean(document.getElementById(`open-${stationId}`).value);
-  const queueLevel = document.getElementById(`queue-${stationId}`).value;
-
-  container.innerHTML = "Loading stations...";
-  
-  fetch("https://fuel-tracker-w4ym.onrender.com/reports", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + getToken()
-    },
-    body: JSON.stringify({
-      stationId,
-      products,
-      evCharging,
-      price: pmsProduct.price,
-      fuelAvailable: pmsProduct.status === "Available" || pmsProduct.status === "Low Stock",
-      isOpen,
-      queueLevel
-    })
-  })
-  .then(res => {
-    if (res.status === 401) {
-      alert("Session expired. Please login again.");
-      return;
-    }
-    return res.json();
-  })
-  .then(() => {
-    alert("Report submitted successfully");
-    loadStations();
-  });
-}
-
 function loadAlerts() {
-  fetch("https://fuel-tracker-w4ym.onrender.com/alerts")
+  fetch("http://localhost:3000/alerts")
     .then(res => res.json())
     .then(data => {
       const alertBox = document.getElementById("alerts");
@@ -3166,120 +3487,6 @@ function loadAlerts() {
 }
 loadAlerts();
 setInterval(loadAlerts, 10000);
-function goToLogin() {
-  window.location.href = loginUrl;
-}
-
-function requireAuthFor(action) {
-  const messages = {
-    report: [
-      "Login to report prices",
-      "Anyone can browse stations, search, check prices, and use the map. Login is required only when submitting a new fuel price report."
-    ],
-    favorites: [
-      "Login to save favorites",
-      "Browsing is open. Login or sign up when you want Fuel Tracker to remember your favorite stations."
-    ],
-    owner: [
-      "Login for station owner tools",
-      "Claiming stations, editing station information, and using the owner dashboard require an authenticated station account."
-    ]
-  };
-  const [title, message] = messages[action] || messages.report;
-  showAuthModal(title, message);
-}
-
-function getSheetHeights() {
-  const viewportHeight = window.innerHeight || 720;
-  const workspaceHeight = discoveryMap?.getBoundingClientRect().height || viewportHeight;
-  return {
-    collapsed: 96,
-    mid: Math.min(Math.round(workspaceHeight * 0.48), workspaceHeight - 76),
-    expanded: Math.min(Math.round(workspaceHeight * 0.82), workspaceHeight - 32)
-  };
-}
-
-function setBottomSheetHeight(height, dragging = false) {
-  if (!discoveryMap || !bottomSheet) return;
-  const heights = getSheetHeights();
-  const nextHeight = Math.max(heights.collapsed, Math.min(height, heights.expanded));
-  discoveryMap.style.setProperty("--sheet-height", `${nextHeight}px`);
-  bottomSheet.classList.toggle("is-dragging", dragging);
-  if (map) {
-    window.requestAnimationFrame(() => map.invalidateSize({ animate: false }));
-  }
-}
-
-function snapBottomSheet(height) {
-  const heights = getSheetHeights();
-  const points = [heights.collapsed, heights.mid, heights.expanded];
-  const nearest = points.reduce((best, point) => {
-    return Math.abs(point - height) < Math.abs(best - height) ? point : best;
-  }, points[0]);
-  setBottomSheetHeight(nearest, false);
-}
-
-function initBottomSheet() {
-  if (!bottomSheet || !sheetHandle) return;
-  let startY = 0;
-  let startHeight = getSheetHeights().collapsed;
-  let activePointerId = null;
-  let dragDistance = 0;
-  let isDragging = false;
-
-  setBottomSheetHeight(getSheetHeights().collapsed);
-
-  sheetHandle.addEventListener("click", () => {
-    if (dragDistance > 12) return;
-    const heights = getSheetHeights();
-    const currentHeight = bottomSheet.getBoundingClientRect().height;
-    const target = currentHeight < heights.mid ? heights.mid : heights.collapsed;
-    setBottomSheetHeight(target);
-  });
-
-  function startDrag(event) {
-    if (activePointerId !== null) return;
-    activePointerId = event.pointerId;
-    startY = event.clientY;
-    startHeight = bottomSheet.getBoundingClientRect().height;
-    dragDistance = 0;
-    isDragging = false;
-    sheetHandle.setPointerCapture(event.pointerId);
-    bottomSheet.classList.add("is-dragging");
-  }
-
-  function moveDrag(event) {
-    if (activePointerId !== event.pointerId) return;
-    const deltaY = startY - event.clientY;
-    dragDistance = Math.max(dragDistance, Math.abs(deltaY));
-    if (Math.abs(deltaY) > 3) isDragging = true;
-    setBottomSheetHeight(startHeight + deltaY, true);
-    if (isDragging) event.preventDefault();
-  }
-
-  function finishDrag(event) {
-    if (activePointerId !== event.pointerId) return;
-    const currentHeight = bottomSheet.getBoundingClientRect().height;
-    const movedEnough = dragDistance > 8;
-    activePointerId = null;
-    bottomSheet.classList.remove("is-dragging");
-    if (movedEnough) {
-      snapBottomSheet(currentHeight);
-    }
-  }
-
-  sheetHandle.addEventListener("pointerdown", startDrag);
-  sheetHandle.addEventListener("pointermove", moveDrag);
-  sheetHandle.addEventListener("pointerup", finishDrag);
-  sheetHandle.addEventListener("pointercancel", finishDrag);
-
-  window.addEventListener("resize", () => {
-    const currentHeight = bottomSheet.getBoundingClientRect().height;
-    snapBottomSheet(currentHeight);
-  });
-}
-
-
 
 searchInput.addEventListener("input", () => {
   if (autocompleteTimer) clearTimeout(autocompleteTimer);
@@ -3305,13 +3512,17 @@ productTabs.addEventListener("click", event => {
   applyStationFilters();
 });
 favoritesFilter.addEventListener("change", () => {
-  if (favoritesFilter.checked && !getToken()) {
-    favoritesFilter.checked = false;
-    requireAuthFor("favorites");
-  }
   applyStationFilters();
 });
 favoriteAlertsFilter.addEventListener("change", loadAlerts);
+allStationsSearch.addEventListener("input", () => {
+  if (stationListMode !== "all") return;
+  applyStationFilters({ fitMap: true });
+});
+allStationsSort.addEventListener("change", () => {
+  if (stationListMode !== "all") return;
+  applyStationFilters({ fitMap: true });
+});
 mapLocateBtn.addEventListener("click", () => {
   if (userLocation && map) {
     updateUserLocationMarker();
@@ -3328,32 +3539,10 @@ function updateUserUI() {
 
   userBar.innerHTML = ""; // 🔥 clear first
 
-  if (getToken()) {
-    userBar.innerHTML = `
-      <span>Logged in ✅</span>
-      <a class="auth-link" href="/partner/login">Owner Portal</a>
-      <button onclick="logout()">Logout</button>
-    `;
-  } else {
-    userBar.innerHTML = `
-      <a class="auth-link" href="${loginUrl}">Log In</a>
-      <a class="auth-link signup-link" href="${signupUrl}">Sign Up</a>
-    `;
-  }
+  userBar.innerHTML = `<a class="auth-link" href="/partner/login">Station Owner Portal</a>`;
 }
-function logout() {
-  localStorage.removeItem("token");
-  alert("Logged out");
-  updateUserUI();
-  applyStationFilters();
-}
-function refreshToken() {
-  return localStorage.getItem("token");
-}
-
 window.onload = function () {
   initMap();
-  initBottomSheet();
   updateUserUI();
   loadStations();
 };

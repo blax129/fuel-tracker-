@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Fuel Tracker</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      color: #172033;
+    }
+
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .auth-box,
+    .owner-card {
+      background: #fff;
+      border: 1px solid #d8dee6;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      border: 1px solid #b8c2cc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #1f6feb;
+      color: #fff;
+    }
+
+    button.secondary {
+      background: #5f6b7a;
+    }
+
+    button.danger {
+      background: #c62828;
+    }
+
+    button.warning {
+      background: #9a6700;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+      color: #4b5563;
+      font-size: 14px;
+    }
+
+    .message {
+      min-height: 22px;
+      margin: 12px 0;
+      font-weight: 700;
+    }
+
+    .empty {
+      background: #fff;
+      border: 1px dashed #b8c2cc;
+      border-radius: 8px;
+      padding: 24px;
+      text-align: center;
+      color: #4b5563;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Admin Dashboard</h1>
+        <p>Review pending station owner accounts.</p>
+      </div>
+      <button class="secondary" id="refreshBtn" type="button">Refresh</button>
+    </header>
+
+    <section class="auth-box">
+      <label for="tokenInput">Admin JWT token</label>
+      <input id="tokenInput" type="password" placeholder="Paste admin token if not already saved">
+      <div class="actions">
+        <button id="saveTokenBtn" type="button">Save Token</button>
+        <button class="secondary" id="clearTokenBtn" type="button">Clear Token</button>
+      </div>
+    </section>
+
+    <div class="message" id="message"></div>
+    <section id="owners"></section>
+  </main>
+
+  <script>
+    const tokenInput = document.getElementById("tokenInput");
+    const message = document.getElementById("message");
+    const ownersWrap = document.getElementById("owners");
+
+    function getToken() {
+      return localStorage.getItem("adminToken") || localStorage.getItem("token") || "";
+    }
+
+    function setMessage(text) {
+      message.textContent = text || "";
+    }
+
+    function formatDate(value) {
+      if (!value) return "Not available";
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? "Not available" : date.toLocaleString();
+    }
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function renderOwners(owners) {
+      if (!owners.length) {
+        ownersWrap.innerHTML = '<div class="empty">No pending station owners found.</div>';
+        return;
+      }
+
+      ownersWrap.innerHTML = owners.map(owner => `
+        <article class="owner-card">
+          <h2>${escapeHtml(owner.stationName || "Unnamed station")}</h2>
+          <div class="meta">
+            <div><strong>Email:</strong> ${escapeHtml(owner.email || "Not available")}</div>
+            <div><strong>Address:</strong> ${escapeHtml(owner.stationAddress || "Not available")}</div>
+            <div><strong>Created:</strong> ${formatDate(owner.createdAt)}</div>
+            <div><strong>Status:</strong> ${escapeHtml(owner.status || "pending")}</div>
+          </div>
+          <div class="actions">
+            <button type="button" data-action="approve" data-id="${owner._id}">Approve</button>
+            <button class="danger" type="button" data-action="reject" data-id="${owner._id}">Reject</button>
+            <button class="warning" type="button" data-action="suspend" data-id="${owner._id}">Suspend</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    async function apiFetch(path, options = {}) {
+      const token = getToken();
+      if (!token) throw new Error("Add an admin token first.");
+
+      const response = await fetch(path, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token,
+          ...(options.headers || {})
+        }
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.message || "Request failed");
+      return data;
+    }
+
+    async function loadOwners() {
+      setMessage("Loading pending owners...");
+      try {
+        const owners = await apiFetch("/api/admin/pending-owners");
+        renderOwners(Array.isArray(owners) ? owners : []);
+        setMessage("");
+      } catch (err) {
+        ownersWrap.innerHTML = "";
+        setMessage(err.message);
+      }
+    }
+
+    async function updateOwner(id, action) {
+      const routeMap = {
+        approve: "/api/admin/approve-owner/",
+        reject: "/api/admin/reject-owner/",
+        suspend: "/api/admin/suspend-owner/"
+      };
+
+      setMessage(action + " owner...");
+      try {
+        await apiFetch(routeMap[action] + id, { method: "POST" });
+        await loadOwners();
+      } catch (err) {
+        setMessage(err.message);
+      }
+    }
+
+    document.getElementById("saveTokenBtn").addEventListener("click", () => {
+      localStorage.setItem("adminToken", tokenInput.value.trim());
+      tokenInput.value = "";
+      loadOwners();
+    });
+
+    document.getElementById("clearTokenBtn").addEventListener("click", () => {
+      localStorage.removeItem("adminToken");
+      setMessage("Admin token cleared.");
+    });
+
+    document.getElementById("refreshBtn").addEventListener("click", loadOwners);
+
+    ownersWrap.addEventListener("click", event => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+      updateOwner(button.dataset.id, button.dataset.action);
+    });
+
+    loadOwners();
+  </script>
+</body>
+</html>

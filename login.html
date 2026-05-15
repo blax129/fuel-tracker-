@@ -727,7 +727,7 @@
       setMessage("Creating your account...");
       setButtonLoading(signupBtn, true, "SIGN UP");
 
-      fetch("https://fuel-tracker-w4ym.onrender.com/register", {
+      fetch("http://localhost:3000/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -775,7 +775,7 @@
       setMessage("Logging in...");
       setButtonLoading(loginBtn, true, "LOG IN");
 
-      fetch("https://fuel-tracker-w4ym.onrender.com/login", {
+      fetch("http://localhost:3000/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
