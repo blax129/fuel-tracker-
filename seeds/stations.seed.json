@@ -1,0 +1,277 @@
+[
+  {
+    "_id": {
+      "$oid": "69f467954f554c0998f01160"
+    },
+    "name": "Abanet Oil",
+    "brand": "Abanet Oil",
+    "area": "Igando-Isuti",
+    "address": "169 Isuti Road, Egan, Lagos State, Nigeria",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1777624981552"
+      }
+    },
+    "location": {
+      "lat": {
+        "$numberDouble": "6.5534228"
+      },
+      "lng": {
+        "$numberDouble": "3.215011666666667"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f467954f554c0998f0115e"
+    },
+    "name": "DAHUSH OIL LTD",
+    "brand": "DAHUSH OIL",
+    "area": "Igando-Egan",
+    "address": "158 Isuti Rd, Ikotun, Lagos 102213, Lagos, Nigeria",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1777624981552"
+      }
+    },
+    "location": {
+      "lat": {
+        "$numberDouble": "6.5468"
+      },
+      "lng": {
+        "$numberDouble": "3.2621"
+      }
+    },
+    "latitude": {
+      "$numberDouble": "6.5536453619571455"
+    },
+    "longitude": {
+      "$numberDouble": "3.2152364863777123"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f34449ae9895d743142614"
+    },
+    "name": "Enyo Service Station, Ikotun-Igando",
+    "brand": "ENYO",
+    "area": "Igando",
+    "address": "H62Q+5R8, Igando Bus Stop, Lasu Rd 102213, Lagos, Nigeria",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1777550409155"
+      }
+    },
+    "location": {
+      "lat": {
+        "$numberDouble": "6.5438"
+      },
+      "lng": {
+        "$numberDouble": "3.2589"
+      }
+    },
+    "latitude": {
+      "$numberDouble": "6.5502307090731975"
+    },
+    "longitude": {
+      "$numberDouble": "3.2396862823979897"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f467954f554c0998f0115f"
+    },
+    "name": "Fat-Noble Petroleum",
+    "brand": "Fat-Noble",
+    "area": "Igando-Akesan",
+    "address": "72 Akesan Rd, Ikotun, Lagos",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1777624981552"
+      }
+    },
+    "location": {
+      "lat": {
+        "$numberDouble": "6.5526"
+      },
+      "lng": {
+        "$numberDouble": "3.2487"
+      }
+    },
+    "latitude": {
+      "$numberDouble": "6.544997383584234"
+    },
+    "longitude": {
+      "$numberDouble": "3.230088715895105"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a06cf18fd25a404111d2254"
+    },
+    "name": "Fidelity Energy Oil & Gas Ltd",
+    "brand": "Fidelity",
+    "area": "Egan",
+    "address": "Ade Olowu street, Egan, Isuti Rd, Igando, Lagos",
+    "latitude": {
+      "$numberDouble": "6.548933417676514"
+    },
+    "longitude": {
+      "$numberDouble": "3.232328758454639"
+    },
+    "fuelAvailable": true,
+    "isOpen": true,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1778831128654"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f467954f554c0998f01161"
+    },
+    "name": "M.O.J.",
+    "brand": "M.O.J.",
+    "area": "Igando-Lasu Road",
+    "address": "Ikotun, Lagos 102213, Lagos, Nigeria",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1777624981552"
+      }
+    },
+    "location": {
+      "lat": {
+        "$numberDouble": "6.5375"
+      },
+      "lng": {
+        "$numberDouble": "3.2522"
+      }
+    },
+    "latitude": {
+      "$numberDouble": "6.553840185556365"
+    },
+    "longitude": {
+      "$numberDouble": "3.245056165052664"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f8827fafc72a629b81268d"
+    },
+    "name": "Mobil Unity Igando",
+    "brand": "Mobil",
+    "area": "Igando",
+    "address": "H62R+5C4, Igando Rd, Ijegun, Lagos 102213, Lagos, Nigeria",
+    "location": {
+      "lat": {
+        "$numberDouble": "6.5601"
+      },
+      "lng": {
+        "$numberDouble": "3.2578"
+      }
+    },
+    "latitude": {
+      "$numberDouble": "6.550399491364058"
+    },
+    "longitude": {
+      "$numberDouble": "3.241048231995122"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f461654f554c0998f0115a"
+    },
+    "name": "NNPC Filling Station",
+    "brand": "NNPC",
+    "area": "Igando-Egan",
+    "address": "72 Isuti Rd, Egan, Igando, Lagos 102213, Lagos, Nigeria",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1777623397566"
+      }
+    },
+    "location": {
+      "lat": {
+        "$numberDouble": "6.5459"
+      },
+      "lng": {
+        "$numberDouble": "3.2606"
+      }
+    },
+    "latitude": {
+      "$numberDouble": "6.552544000365021"
+    },
+    "longitude": {
+      "$numberDouble": "3.225824085795118"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f8827fafc72a629b81268b"
+    },
+    "name": "NNPC Igando Central",
+    "brand": "NNPC Retail",
+    "area": "Igando",
+    "address": "12 Igando-Ikotun Road, Igando, Lagos",
+    "location": {
+      "lat": {
+        "$numberDouble": "6.5578"
+      },
+      "lng": {
+        "$numberDouble": "3.2615"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f8827fafc72a629b81268f"
+    },
+    "name": "Oando Greenline Igando",
+    "brand": "Oando",
+    "area": "Igando",
+    "address": "G6XQ+X72, Lasu Rd, Ikotun, Lagos 102213, Lagos, Nigeria",
+    "location": {
+      "lat": {
+        "$numberDouble": "6.5514"
+      },
+      "lng": {
+        "$numberDouble": "3.2647"
+      }
+    },
+    "latitude": {
+      "$numberDouble": "6.55000782928741"
+    },
+    "longitude": {
+      "$numberDouble": "3.238348105604823"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f461654f554c0998f01159"
+    },
+    "name": "TotalEnergies - Igando Service Station",
+    "brand": "Total Energies",
+    "area": "Igando - Olowoila Bus Stop",
+    "address": "Olowoila Bus Stop, Igando Rd, Lagos",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1777623397566"
+      }
+    },
+    "location": {
+      "lat": {
+        "$numberDouble": "6.5513"
+      },
+      "lng": {
+        "$numberDouble": "3.2682"
+      }
+    },
+    "latitude": {
+      "$numberDouble": "6.548883931250213"
+    },
+    "longitude": {
+      "$numberDouble": "3.237804971824286"
+    }
+  }
+]
